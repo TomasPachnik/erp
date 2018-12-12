@@ -2,12 +2,13 @@ package sk.tomas.erp.bo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class Invoice extends BaseEntity {
+public class Invoice extends BaseEntity implements Serializable {
 
     private String currency;
     private Issuer issuer;
@@ -29,4 +30,8 @@ public class Invoice extends BaseEntity {
         return total;
     }
 
+    @Override
+    public String toString() {
+        return currency;
+    }
 }
