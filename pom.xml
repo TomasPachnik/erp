@@ -31,6 +31,12 @@
 			<version>1.18.4</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.7.0</version>
+		</dependency>
+
 		<!-- test dependecies-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
