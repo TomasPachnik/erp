@@ -2,10 +2,14 @@ package sk.tomas.erp.bo;
 
 import lombok.Data;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 @Data
-public class Issuer implements Serializable {
+@Entity
+@Table(name = "issuer")
+public class Issuer extends BaseEntity {
 
     private String name;
     private String phone;

@@ -1,0 +1,4 @@
+2018-12-13 09:18:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Hodnota je príliš dlhá pre stĺpec "CUSTOMER BINARY(255)": "X'aced00057372001b736b2e746f6d61732e6572702e626f2e4c6567616c456e746974795c4ef28bcc73ffd20200034c0007616464726573737400194c736b2f... (571)"
+Value too long for column "CUSTOMER BINARY(255)": "X'aced00057372001b736b2e746f6d61732e6572702e626f2e4c6567616c456e746974795c4ef28bcc73ffd20200034c0007616464726573737400194c736b2f... (571)"; SQL statement:
+insert into PUBLIC.invoice (currency, customer, dateOfIssue, deliveryDate, dueDate, invoiceNumber, issuer, supplier, supplierBankAccount, supplierVariableSymbol, id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [22001-197]
