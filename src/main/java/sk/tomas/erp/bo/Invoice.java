@@ -1,9 +1,7 @@
 package sk.tomas.erp.bo;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.Data;
-import sk.tomas.erp.entity.BankAccountEntity;
-import sk.tomas.erp.entity.IssuerEntity;
-import sk.tomas.erp.entity.LegalEntity;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -15,17 +13,18 @@ public class Invoice {
 
     private UUID uuid;
     private String currency;
-    private IssuerEntity issuer;
+    private Issue issuer;
     private String invoiceNumber;
-    private LegalEntity supplier;
-    private LegalEntity customer;
-    private BankAccountEntity supplierBankAccount;
+    private Legal supplier;
+    private Legal customer;
+    private BankAccount supplierBankAccount;
     private String supplierVariableSymbol;
     private Date dateOfIssue;
     private Date deliveryDate;
     private Date dueDate;
     private List<Asset> assets;
 
+    @JsonGetter("total")
     public BigDecimal total() {
         BigDecimal total = BigDecimal.ZERO;
         for (Asset asset : assets) {

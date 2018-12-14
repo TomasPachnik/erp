@@ -2,9 +2,7 @@ package sk.tomas.erp.entity;
 
 import lombok.Data;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class InvoiceEntity extends BaseEntity {
     private Date dateOfIssue;
     private Date deliveryDate;
     private Date dueDate;
-    @ElementCollection
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<AssetEntity> assets;
 
 }
