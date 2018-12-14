@@ -17,9 +17,5 @@ public class ErpApplication {
         invoiceService.getById(null);
     }
 
-    @Bean
-    public SessionFactory sessionFactory() {
-        return new Configuration().configure().buildSessionFactory();
-    }
 
 }
