@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import sk.tomas.erp.dto.Invoice;
+import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.service.InvoiceService;
 
 import java.io.File;
@@ -21,7 +21,7 @@ public class ErpApplicationTests {
 
 	@Test
 	public void contextLoads() throws IOException, JRException {
-		Invoice invoice = new Invoice();
+		InvoiceEntity invoice = new InvoiceEntity();
 		invoice.setCurrency("nejaka");
 		File nazov = invoiceService.generatePdf(invoice, "nazov");
 		System.out.println();

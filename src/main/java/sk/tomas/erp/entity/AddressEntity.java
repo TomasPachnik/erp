@@ -1,4 +1,4 @@
-package sk.tomas.erp.dto;
+package sk.tomas.erp.entity;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "address")
-public class Address extends BaseEntity {
+public class AddressEntity extends BaseEntity {
 
     private String name;
     private String street;

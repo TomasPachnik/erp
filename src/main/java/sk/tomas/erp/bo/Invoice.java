@@ -1,23 +1,25 @@
 package sk.tomas.erp.bo;
 
 import lombok.Data;
-import sk.tomas.erp.dto.BankAccount;
-import sk.tomas.erp.dto.Issuer;
-import sk.tomas.erp.dto.LegalEntity;
+import sk.tomas.erp.entity.BankAccountEntity;
+import sk.tomas.erp.entity.IssuerEntity;
+import sk.tomas.erp.entity.LegalEntity;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class Invoice {
 
+    private UUID uuid;
     private String currency;
-    private Issuer issuer;
+    private IssuerEntity issuer;
     private String invoiceNumber;
     private LegalEntity supplier;
     private LegalEntity customer;
-    private BankAccount supplierBankAccount;
+    private BankAccountEntity supplierBankAccount;
     private String supplierVariableSymbol;
     private Date dateOfIssue;
     private Date deliveryDate;

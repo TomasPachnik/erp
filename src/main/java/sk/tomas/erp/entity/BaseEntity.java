@@ -1,4 +1,4 @@
-package sk.tomas.erp.dto;
+package sk.tomas.erp.entity;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;

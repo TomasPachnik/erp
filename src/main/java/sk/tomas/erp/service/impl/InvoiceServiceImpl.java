@@ -1,8 +1,13 @@
 package sk.tomas.erp.service.impl;
 
 import net.sf.jasperreports.engine.*;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sk.tomas.erp.dto.Invoice;
+import sk.tomas.erp.ResourceNotFoundException;
+import sk.tomas.erp.bo.Invoice;
+import sk.tomas.erp.entity.InvoiceEntity;
+import sk.tomas.erp.repository.InvoiceRepository;
 import sk.tomas.erp.service.InvoiceService;
 
 import java.io.File;
@@ -16,8 +21,21 @@ import java.util.UUID;
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
 
+    @Autowired
+    private ModelMapper mapper;
+
+    @Autowired
+    InvoiceRepository invoiceRepository;
+
     @Override
-    public File generatePdf(Invoice invoice, String name) throws JRException, IOException {
+    public Invoice get(UUID uuid) {
+        return invoiceRepository.findById(uuid)
+                .map(invoiceEntity -> mapper.map(invoiceEntity, Invoice.class))
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id " + uuid));
+    }
+
+    @Override
+    public File generatePdf(InvoiceEntity invoice, String name) throws JRException, IOException {
         InputStream mainStream = InvoiceServiceImpl.class.getResourceAsStream("/Invoice.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(mainStream);
         Map<String, Object> params = new HashMap<>();
@@ -27,10 +45,5 @@ public class InvoiceServiceImpl implements InvoiceService {
         JasperExportManager.exportReportToPdfStream(print, new FileOutputStream(pdf));
         return pdf;
     }
-
-    public UUID create(Invoice invoice) {
-        return null;
-    }
-
 
 }

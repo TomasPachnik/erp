@@ -1,4 +1,4 @@
-package sk.tomas.erp.dto;
+package sk.tomas.erp.entity;
 
 import lombok.Data;
 
@@ -12,6 +12,6 @@ public class LegalEntity extends BaseEntity {
 
     private String companyIdentificationNumber;
     private String taxIdentificationNumber;
-    private Address address;
+    private AddressEntity address;
 
 }

@@ -1,4 +1,4 @@
-package sk.tomas.erp.dto;
+package sk.tomas.erp.entity;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @Entity
 @Table(name = "asset")
-public class Asset extends BaseEntity {
+public class AssetEntity extends BaseEntity {
 
     private String name;
     private BigDecimal count;

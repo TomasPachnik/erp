@@ -2,8 +2,8 @@ package sk.tomas.erp;
 
 import org.junit.Assert;
 import org.junit.Test;
-import sk.tomas.erp.dto.Asset;
-import sk.tomas.erp.dto.Invoice;
+import sk.tomas.erp.entity.AssetEntity;
+import sk.tomas.erp.entity.InvoiceEntity;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -13,9 +13,9 @@ public class InvoiceTest {
 
     @Test
     public void testInvoiceTotalSum() {
-        Invoice invoice = new Invoice();
-        Asset asset1 = new Asset();
-        Asset asset2 = new Asset();
+        InvoiceEntity invoice = new InvoiceEntity();
+        AssetEntity asset1 = new AssetEntity();
+        AssetEntity asset2 = new AssetEntity();
         asset1.setCount(new BigDecimal("2"));
         asset1.setUnitPrice(new BigDecimal("0.3"));
         asset2.setCount(new BigDecimal("3"));
@@ -29,7 +29,7 @@ public class InvoiceTest {
     @Test
     public void testInvoiceObject() {
         PodamFactory factory = new PodamFactoryImpl();
-        Invoice invoice = factory.manufacturePojo(Invoice.class);
+        InvoiceEntity invoice = factory.manufacturePojo(InvoiceEntity.class);
         Assert.assertNotNull(invoice);
     }
 }
