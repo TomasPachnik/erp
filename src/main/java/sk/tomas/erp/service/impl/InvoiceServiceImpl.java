@@ -17,11 +17,6 @@ import java.util.UUID;
 public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
-    public Invoice getById(UUID uuid) {
-        return null;
-    }
-
-    @Override
     public File generatePdf(Invoice invoice, String name) throws JRException, IOException {
         InputStream mainStream = InvoiceServiceImpl.class.getResourceAsStream("/Invoice.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(mainStream);
@@ -34,9 +29,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     public UUID create(Invoice invoice) {
-       return null;
+        return null;
     }
-
 
 
 }
