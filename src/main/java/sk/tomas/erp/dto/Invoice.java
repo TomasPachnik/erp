@@ -1,16 +1,19 @@
-package sk.tomas.erp.bo;
+package sk.tomas.erp.dto;
 
 import lombok.Data;
-import sk.tomas.erp.dto.BankAccount;
-import sk.tomas.erp.dto.Issuer;
-import sk.tomas.erp.dto.LegalEntity;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class Invoice {
+@Entity
+@Table(name = "invoice")
+public class Invoice extends BaseEntity {
 
     private String currency;
     private Issuer issuer;
@@ -22,15 +25,7 @@ public class Invoice {
     private Date dateOfIssue;
     private Date deliveryDate;
     private Date dueDate;
+    @ElementCollection
     private List<Asset> assets;
-
-    public BigDecimal total() {
-        BigDecimal total = BigDecimal.ZERO;
-        for (Asset asset : assets) {
-            total = total.add(asset.total());
-        }
-        return total;
-    }
-
 
 }

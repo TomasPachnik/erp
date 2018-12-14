@@ -2,13 +2,12 @@ package sk.tomas.erp;
 
 import org.junit.Assert;
 import org.junit.Test;
-import sk.tomas.erp.bo.Asset;
-import sk.tomas.erp.bo.Invoice;
+import sk.tomas.erp.dto.Asset;
+import sk.tomas.erp.dto.Invoice;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 
 public class InvoiceTest {
 

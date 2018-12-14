@@ -1,10 +1,9 @@
-package sk.tomas.erp.bo;
+package sk.tomas.erp.dto;
 
 import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.io.Serializable;
 
 @Data
 @Entity

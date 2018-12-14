@@ -1,4 +1,4 @@
-package sk.tomas.erp.bo;
+package sk.tomas.erp.dto;
 
 import lombok.Data;
 

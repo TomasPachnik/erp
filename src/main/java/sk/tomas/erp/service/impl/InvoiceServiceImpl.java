@@ -2,7 +2,7 @@ package sk.tomas.erp.service.impl;
 
 import net.sf.jasperreports.engine.*;
 import org.springframework.stereotype.Service;
-import sk.tomas.erp.bo.Invoice;
+import sk.tomas.erp.dto.Invoice;
 import sk.tomas.erp.service.InvoiceService;
 
 import java.io.File;

@@ -1,7 +1,7 @@
 package sk.tomas.erp.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sk.tomas.erp.bo.Invoice;
+import sk.tomas.erp.dto.Invoice;
 
 import java.util.UUID;
 
