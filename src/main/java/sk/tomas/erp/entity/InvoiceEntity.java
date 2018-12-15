@@ -9,13 +9,22 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "invoice")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class InvoiceEntity extends BaseEntity {
 
     private String currency;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(unique = true)
     private IssuerEntity issuer;
     private String invoiceNumber;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(unique = true)
     private LegalEntity supplier;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(unique = true)
     private LegalEntity customer;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(unique = true)
     private BankAccountEntity supplierBankAccount;
     private String supplierVariableSymbol;
     private Date dateOfIssue;
