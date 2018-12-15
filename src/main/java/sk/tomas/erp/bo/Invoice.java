@@ -12,9 +12,9 @@ import java.util.UUID;
 public class Invoice {
 
     private UUID uuid;
+    private String invoiceNumber;
     private String currency;
     private Issue issuer;
-    private String invoiceNumber;
     private Legal supplier;
     private Legal customer;
     private BankAccount supplierBankAccount;

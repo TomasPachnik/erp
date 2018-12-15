@@ -17,11 +17,15 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
+
     private ModelMapper mapper;
+    private UserRepository userRepository;
 
     @Autowired
-    UserRepository userRepository;
+    public UserServiceImpl(ModelMapper mapper, UserRepository userRepository) {
+        this.mapper = mapper;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public User generate() {

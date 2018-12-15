@@ -4,7 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sk.tomas.erp.ResourceNotFoundException;
+import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.bo.Legal;
 import sk.tomas.erp.entity.LegalEntity;
 import sk.tomas.erp.repository.LegalRepository;
@@ -17,11 +17,14 @@ import java.util.UUID;
 @Service
 public class LegalServiceImpl implements LegalService {
 
-    @Autowired
     private ModelMapper mapper;
+    private LegalRepository legalRepository;
 
     @Autowired
-    LegalRepository legalRepository;
+    public LegalServiceImpl(ModelMapper mapper, LegalRepository legalRepository) {
+        this.mapper = mapper;
+        this.legalRepository = legalRepository;
+    }
 
     @Override
     public Legal get(UUID uuid) {

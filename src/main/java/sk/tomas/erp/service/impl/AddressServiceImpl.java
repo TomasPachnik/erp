@@ -4,7 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sk.tomas.erp.ResourceNotFoundException;
+import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.bo.Address;
 import sk.tomas.erp.entity.AddressEntity;
 import sk.tomas.erp.repository.AddressRepository;
@@ -17,11 +17,14 @@ import java.util.UUID;
 @Service
 public class AddressServiceImpl implements AddressService {
 
-    @Autowired
     private ModelMapper mapper;
+    private AddressRepository addressRepository;
 
     @Autowired
-    AddressRepository addressRepository;
+    public AddressServiceImpl(ModelMapper mapper, AddressRepository addressRepository) {
+        this.mapper = mapper;
+        this.addressRepository = addressRepository;
+    }
 
     @Override
     public Address get(UUID uuid) {

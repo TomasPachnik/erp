@@ -16,15 +16,15 @@ import java.io.IOException;
 @SpringBootTest
 public class ErpApplicationTests {
 
-	@Autowired
-	private InvoiceService invoiceService;
+    @Autowired
+    private InvoiceService invoiceService;
 
-	@Test
-	public void contextLoads() throws IOException, JRException {
-		InvoiceEntity invoice = new InvoiceEntity();
-		invoice.setCurrency("nejaka");
-		File nazov = invoiceService.generatePdf(invoice, "nazov");
-		System.out.println();
-	}
+    @Test
+    public void contextLoads() throws IOException, JRException {
+        InvoiceEntity invoice = new InvoiceEntity();
+        invoice.setCurrency("nejaka");
+        //File nazov = invoiceService.generatePdf(invoice);
+        System.out.println();
+    }
 
 }
