@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.ResourceNotFoundException;
 import sk.tomas.erp.bo.Address;
-import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.entity.AddressEntity;
-import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.repository.AddressRepository;
 import sk.tomas.erp.service.AddressService;
 
@@ -28,8 +26,8 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public Address get(UUID uuid) {
         return addressRepository.findById(uuid)
-                .map(invoiceEntity -> mapper.map(addressRepository, Address.class))
-                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id " + uuid));
+                .map(addressEntity -> mapper.map(addressEntity, Address.class))
+                .orElseThrow(() -> new ResourceNotFoundException(Address.class.getSimpleName() + " not found with id " + uuid));
     }
 
     @Override

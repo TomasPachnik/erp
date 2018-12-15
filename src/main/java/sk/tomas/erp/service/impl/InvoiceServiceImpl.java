@@ -38,7 +38,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public Invoice get(UUID uuid) {
         return invoiceRepository.findById(uuid)
                 .map(invoiceEntity -> mapper.map(invoiceEntity, Invoice.class))
-                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id " + uuid));
+                .orElseThrow(() -> new ResourceNotFoundException(Invoice.class.getSimpleName() + " not found with id " + uuid));
     }
 
     @Override
