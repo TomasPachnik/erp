@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Table(name = "legal")
 public class LegalEntity extends BaseEntity {
 
+    private String name;
     private String companyIdentificationNumber;
     private String taxIdentificationNumber;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

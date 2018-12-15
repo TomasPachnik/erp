@@ -10,7 +10,6 @@ import javax.persistence.Table;
 @Table(name = "address")
 public class AddressEntity extends BaseEntity {
 
-    private String name;
     private String street;
     private String houseNumber;
     private String postalCode;
