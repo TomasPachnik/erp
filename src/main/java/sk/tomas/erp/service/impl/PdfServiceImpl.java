@@ -2,8 +2,12 @@ package sk.tomas.erp.service.impl;
 
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
+import org.iban4j.Iban;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.exception.PdfGenerateException;
@@ -19,6 +23,9 @@ public class PdfServiceImpl implements PdfService {
 
     private static Logger logger = LoggerFactory.getLogger(PdfServiceImpl.class);
 
+    @Autowired
+    private Environment env;
+
     @Override
     public byte[] generatePdf(Invoice invoice) {
         try {
@@ -30,8 +37,8 @@ public class PdfServiceImpl implements PdfService {
     }
 
     private File privateGeneratePdf(Invoice invoice, String name) throws JRException, IOException {
-        InputStream mainStream = InvoiceServiceImpl.class.getResourceAsStream("/invoice.jrxml");
-        JasperReport jasperReport = JasperCompileManager.compileReport(mainStream);
+        InputStream invoiceStream = InvoiceServiceImpl.class.getResourceAsStream("/invoice.jasper");
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(invoiceStream);
         Map<String, Object> params = map(invoice);
         JasperPrint print = JasperFillManager.fillReport(jasperReport, params, new JREmptyDataSource());
         File pdf = File.createTempFile(name + ".", ".pdf");
@@ -42,31 +49,32 @@ public class PdfServiceImpl implements PdfService {
     private Map<String, Object> map(Invoice invoice) {
         Map<String, Object> params = new HashMap<>();
         Map<String, Object> translations = new HashMap<>();
-
         JRBeanCollectionDataSource assets = new JRBeanCollectionDataSource(invoice.getAssets());
 
-        translations.put("invoice", "Faktúra");
-        translations.put("supplier", "Dodávateľ:");
-        translations.put("customer", "Odberateľ:");
-        translations.put("bankName", "Banka:");
-        translations.put("iban", "IBAN:");
-        translations.put("variableSymbol", "Variabilný symbol:");
-        translations.put("crn", "IČO:");
-        translations.put("vat", "DIČ:");
-        translations.put("dateOfIssue", "Dátum vystavenia:");
-        translations.put("deliveryDate", "Dátum dodania:");
-        translations.put("dueDate", "Dátum splatnosti:");
-        translations.put("nameAndDesc", "Názov a popis položky:");
-        translations.put("count", "Počet");
-        translations.put("unit", "Jednotka");
-        translations.put("unitCount", "Jednotková cena");
-        translations.put("total", "Celkom");
-        translations.put("note", "Poznámka:");
-        translations.put("totalPrice", "Celková suma:");
-        translations.put("signatureAndStamp", "Podpis a pečiatka:");
-        translations.put("issuer", "Vystavil:");
-        translations.put("generatedBy", "Vytvorené pomocou ERP");
-        translations.put("page", "Strana:");
+        Iban iban = Iban.valueOf(invoice.getSupplierBankAccount().getIban());
+
+        translations.put("invoice", env.getProperty("invoice"));
+        translations.put("supplier", env.getProperty("supplier"));
+        translations.put("customer", env.getProperty("customer"));
+        translations.put("bankName", env.getProperty("bankName"));
+        translations.put("iban", env.getProperty("iban"));
+        translations.put("variableSymbol", env.getProperty("variableSymbol"));
+        translations.put("crn", env.getProperty("crn"));
+        translations.put("vat", env.getProperty("vat"));
+        translations.put("dateOfIssue", env.getProperty("dateOfIssue"));
+        translations.put("deliveryDate", env.getProperty("deliveryDate"));
+        translations.put("dueDate", env.getProperty("dueDate"));
+        translations.put("nameAndDesc", env.getProperty("nameAndDesc"));
+        translations.put("count", env.getProperty("count"));
+        translations.put("unit", env.getProperty("unit"));
+        translations.put("unitCount", env.getProperty("unitCount"));
+        translations.put("total", env.getProperty("total"));
+        translations.put("note", env.getProperty("note"));
+        translations.put("totalPrice", env.getProperty("totalPrice"));
+        translations.put("signatureAndStamp", env.getProperty("signatureAndStamp"));
+        translations.put("issuer", env.getProperty("issuer"));
+        translations.put("generatedBy", env.getProperty("generatedBy"));
+        translations.put("page", env.getProperty("page"));
 
         params.put("currency", invoice.getCurrency());
         params.put("invoiceNumber", translations.get("invoice") + " " + invoice.getInvoiceNumber());
@@ -83,7 +91,6 @@ public class PdfServiceImpl implements PdfService {
         params.put("supplier.companyIdentificationNumber", translations.get("crn") + " " + invoice.getSupplier().getCompanyIdentificationNumber());
         params.put("supplier.taxIdentificationNumber", translations.get("vat") + " " + invoice.getSupplier().getTaxIdentificationNumber());
 
-
         params.put("customer.name", invoice.getCustomer().getName());
         params.put("customer.address.street", invoice.getCustomer().getAddress().getStreet());
         params.put("customer.address.houseNumber", invoice.getCustomer().getAddress().getHouseNumber());
@@ -94,7 +101,7 @@ public class PdfServiceImpl implements PdfService {
         params.put("customer.taxIdentificationNumber", translations.get("vat") + " " + invoice.getCustomer().getTaxIdentificationNumber());
 
         params.put("supplierBankAccount.bankName", translations.get("bankName") + " " + invoice.getSupplierBankAccount().getBankName());
-        params.put("supplierBankAccount.iban", translations.get("iban") + " " + invoice.getSupplierBankAccount().getIban());
+        params.put("supplierBankAccount.iban", translations.get("iban") + " " + iban.toFormattedString());
 
         params.put("supplierVariableSymbol", translations.get("variableSymbol") + " " + invoice.getSupplierVariableSymbol());
 
