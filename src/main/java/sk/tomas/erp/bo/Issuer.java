@@ -3,7 +3,7 @@ package sk.tomas.erp.bo;
 import lombok.Data;
 
 @Data
-public class Issue {
+public class Issuer {
 
     private String name;
     private String phone;
