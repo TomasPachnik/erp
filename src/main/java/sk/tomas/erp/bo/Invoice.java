@@ -23,12 +23,13 @@ public class Invoice {
     private Date deliveryDate;
     private Date dueDate;
     private List<Asset> assets;
+    private String note;
 
     @JsonGetter("total")
-    public BigDecimal total() {
+    public BigDecimal getTotal() {
         BigDecimal total = BigDecimal.ZERO;
         for (Asset asset : assets) {
-            total = total.add(asset.total());
+            total = total.add(asset.getTotal());
         }
         return total;
     }

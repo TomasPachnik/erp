@@ -7,6 +7,5 @@ public class BankAccount {
 
     private String bankName;
     private String iban;
-    private String swift;
 
 }

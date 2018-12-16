@@ -12,6 +12,5 @@ public class BankAccountEntity extends BaseEntity {
 
     private String bankName;
     private String iban;
-    private String swift;
 
 }

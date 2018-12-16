@@ -14,7 +14,7 @@ public class Asset {
     private BigDecimal unitPrice;
 
     @JsonGetter("total")
-    public BigDecimal total() {
+    public BigDecimal getTotal() {
         return count.multiply(unitPrice);
     }
 

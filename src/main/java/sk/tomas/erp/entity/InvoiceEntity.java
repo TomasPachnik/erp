@@ -32,5 +32,6 @@ public class InvoiceEntity extends BaseEntity {
     private Date dueDate;
     @OneToMany(cascade = {CascadeType.ALL})
     private List<AssetEntity> assets;
+    private String note;
 
 }
