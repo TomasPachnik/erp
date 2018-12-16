@@ -15,8 +15,12 @@ import java.util.UUID;
 @RequestMapping("/legals")
 public class LegalController {
 
+    private final LegalService legalService;
+
     @Autowired
-    private LegalService legalService;
+    public LegalController(LegalService legalService) {
+        this.legalService = legalService;
+    }
 
     @GetMapping("/{uuid}")
     public Legal get(@PathVariable UUID uuid) {

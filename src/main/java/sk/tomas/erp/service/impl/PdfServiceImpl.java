@@ -23,8 +23,12 @@ public class PdfServiceImpl implements PdfService {
 
     private static Logger logger = LoggerFactory.getLogger(PdfServiceImpl.class);
 
+    private final Environment env;
+
     @Autowired
-    private Environment env;
+    public PdfServiceImpl(Environment env) {
+        this.env = env;
+    }
 
     @Override
     public byte[] generatePdf(Invoice invoice) {

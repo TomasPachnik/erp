@@ -20,10 +20,14 @@ import java.util.UUID;
 @RequestMapping("/invoices")
 public class InvoiceController {
 
+    private final InvoiceService invoiceService;
+    private final PdfService pdfService;
+
     @Autowired
-    private InvoiceService invoiceService;
-    @Autowired
-    private PdfService pdfService;
+    public InvoiceController(InvoiceService invoiceService, PdfService pdfService) {
+        this.invoiceService = invoiceService;
+        this.pdfService = pdfService;
+    }
 
     @GetMapping("/{uuid}")
     public Invoice get(@PathVariable UUID uuid) {

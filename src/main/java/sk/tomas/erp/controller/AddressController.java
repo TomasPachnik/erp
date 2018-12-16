@@ -15,8 +15,12 @@ import java.util.UUID;
 @RequestMapping("/addresses")
 public class AddressController {
 
+    private final AddressService addressService;
+
     @Autowired
-    private AddressService addressService;
+    public AddressController(AddressService addressService) {
+        this.addressService = addressService;
+    }
 
     @GetMapping("/{uuid}")
     public Address get(@PathVariable UUID uuid) {
