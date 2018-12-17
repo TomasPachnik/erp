@@ -1,13 +1,12 @@
 package sk.tomas.erp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.service.UserService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -25,9 +24,19 @@ public class UserController {
         return userService.all();
     }
 
-    @GetMapping("/generate")
-    public User generate() {
-        return userService.generate();
+    @GetMapping("/{uuid}")
+    public User get(@PathVariable UUID uuid) {
+        return userService.get(uuid);
+    }
+
+    @GetMapping("/delete/{uuid}")
+    public boolean delete(@PathVariable UUID uuid) {
+        return userService.delete(uuid);
+    }
+
+    @PostMapping(path = "/save")
+    public UUID save(@RequestBody User user) {
+        return userService.save(user);
     }
 
 }

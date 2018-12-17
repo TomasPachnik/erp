@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class Asset {
+public class Asset extends Base {
 
     private String name;
     private BigDecimal count;

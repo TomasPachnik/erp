@@ -6,15 +6,13 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Data
-public class Invoice {
+public class Invoice extends Base{
 
-    private UUID uuid;
     private String invoiceNumber;
     private String currency;
-    private Issuer issuer;
+    private User user;
     private Legal supplier;
     private Legal customer;
     private BankAccount supplierBankAccount;

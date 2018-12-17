@@ -16,7 +16,7 @@ public class InvoiceEntity extends BaseEntity {
     private String currency;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
-    private IssuerEntity issuer;
+    private UserEntity user;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
     private LegalEntity supplier;

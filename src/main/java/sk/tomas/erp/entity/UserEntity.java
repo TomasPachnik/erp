@@ -10,8 +10,9 @@ import javax.persistence.*;
 public class UserEntity extends BaseEntity {
 
     private String name;
-    private String surname;
     private String login;
+    private String phone;
+    private String email;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)

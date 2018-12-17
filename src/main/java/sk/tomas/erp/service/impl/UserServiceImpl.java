@@ -3,17 +3,17 @@ package sk.tomas.erp.service.impl;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import sk.tomas.erp.ShortStringManufacturer;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.entity.UserEntity;
+import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.repository.UserRepository;
 import sk.tomas.erp.service.UserService;
-import uk.co.jemos.podam.api.PodamFactory;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -28,18 +28,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User generate() {
-        PodamFactory factory = new PodamFactoryImpl();
-        factory.getStrategy().addOrReplaceTypeManufacturer(String.class, new ShortStringManufacturer());
-        UserEntity userEntity = userRepository.save(factory.manufacturePojo(UserEntity.class));
-        return mapper.map(userEntity, User.class);
-    }
-
-    @Override
     public List<User> all() {
         List<UserEntity> all = userRepository.findAll();
         Type listType = new TypeToken<List<User>>() {
         }.getType();
         return mapper.map(all, listType);
+    }
+
+    @Override
+    public UUID save(User user) {
+        return userRepository.save(mapper.map(user, UserEntity.class)).getUuid();
+    }
+
+    @Override
+    public User get(UUID uuid) {
+        return userRepository.findById(uuid)
+                .map(userEntity -> mapper.map(userEntity, User.class))
+                .orElseThrow(() -> new ResourceNotFoundException(User.class.getSimpleName() + " not found with id " + uuid));
+    }
+
+    @Override
+    public boolean delete(UUID uuid) {
+        try {
+            userRepository.deleteById(uuid);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 }

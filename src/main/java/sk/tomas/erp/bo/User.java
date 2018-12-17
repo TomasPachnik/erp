@@ -3,10 +3,11 @@ package sk.tomas.erp.bo;
 import lombok.Data;
 
 @Data
-public class User {
+public class User extends Base {
 
     private String name;
-    private String surname;
     private String login;
+    private String phone;
+    private String email;
 
 }

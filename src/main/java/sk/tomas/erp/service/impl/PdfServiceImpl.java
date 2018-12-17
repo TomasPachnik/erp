@@ -121,9 +121,9 @@ public class PdfServiceImpl implements PdfService {
         params.put("customer.total", invoice.getTotal());
         params.put("noteValue", invoice.getNote());
 
-        params.put("issuer.name", invoice.getIssuer().getName());
-        params.put("issuer.email", invoice.getIssuer().getEmail());
-        params.put("issuer.phone", invoice.getIssuer().getPhone());
+        params.put("issuer.name", invoice.getUser().getName());
+        params.put("issuer.email", invoice.getUser().getEmail());
+        params.put("issuer.phone", invoice.getUser().getPhone());
 
         params.put("nameAndDesc", translations.get("nameAndDesc"));
         params.put("count", translations.get("count"));
