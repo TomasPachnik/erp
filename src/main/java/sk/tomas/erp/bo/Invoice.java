@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 public class Invoice extends Base{
 
+    private String name;
     private String invoiceNumber;
     private String currency;
     private User user;

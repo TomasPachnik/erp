@@ -9,8 +9,9 @@ import javax.persistence.*;
 @Table(name = "user_table")
 public class UserEntity extends BaseEntity {
 
-    private String name;
+    @Column(unique = true)
     private String login;
+    private String name;
     private String phone;
     private String email;
 

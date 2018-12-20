@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sk.tomas.erp.bo.ServerMessage;
+import sk.tomas.erp.exception.SqlException;
 
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
@@ -24,6 +25,12 @@ public class ExceptionHandlerController implements ErrorController {
     @ExceptionHandler(AccessDeniedException.class)
     public ServerMessage businessException(AccessDeniedException e) {
         return new ServerMessage("AccessDeniedException", "Forbidden");
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(SqlException.class)
+    public ServerMessage sqlException(SqlException e) {
+        return new ServerMessage("SqlException", "constraint exception");
     }
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)

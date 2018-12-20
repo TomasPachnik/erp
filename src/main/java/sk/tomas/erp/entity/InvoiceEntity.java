@@ -12,6 +12,7 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class InvoiceEntity extends BaseEntity {
 
+    private String name;
     private String invoiceNumber;
     private String currency;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

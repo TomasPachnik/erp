@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/save")
-    public UUID save(@RequestBody User user) {
+    public UUID save(@Valid @RequestBody User user) {
         return userService.save(user);
     }
 

@@ -2,12 +2,16 @@ package sk.tomas.erp.service.impl;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
+import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.repository.UserRepository;
 import sk.tomas.erp.service.UserService;
 
@@ -17,6 +21,8 @@ import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private ModelMapper mapper;
     private UserRepository userRepository;
@@ -37,7 +43,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UUID save(User user) {
-        return userRepository.save(mapper.map(user, UserEntity.class)).getUuid();
+        try {
+            return userRepository.save(mapper.map(user, UserEntity.class)).getUuid();
+        } catch (DataIntegrityViolationException e) {
+            logger.error(e.getMessage());
+            throw new SqlException("Cannot save user");
+        }
     }
 
     @Override

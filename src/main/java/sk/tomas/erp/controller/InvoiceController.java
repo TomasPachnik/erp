@@ -39,11 +39,6 @@ public class InvoiceController {
         return invoiceService.all();
     }
 
-    @GetMapping("/generate")
-    public Invoice generate() {
-        return invoiceService.generate();
-    }
-
     @GetMapping(path = "/generate/{uuid}", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> generateInvoice(@PathVariable UUID uuid) {
 

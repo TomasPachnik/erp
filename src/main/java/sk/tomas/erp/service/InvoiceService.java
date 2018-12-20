@@ -9,8 +9,6 @@ public interface InvoiceService {
 
     Invoice get(UUID uuid);
 
-    Invoice generate();
-
     List<Invoice> all();
 
     byte[] generatePdf(UUID uuid);
