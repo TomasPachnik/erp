@@ -17,12 +17,12 @@ import static org.springframework.http.ResponseEntity.ok;
 public class UserinfoController {
 
     @GetMapping("/me")
-    public ResponseEntity currentUser(@AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity currentUser(@AuthenticationPrincipal UserDetails userDetails) {
         Map<Object, Object> model = new HashMap<>();
         model.put("username", userDetails.getUsername());
         model.put("roles", userDetails.getAuthorities()
                 .stream()
-                .map(a -> ((GrantedAuthority) a).getAuthority())
+                .map(a -> a.getAuthority())
                 .collect(toList())
         );
         return ok(model);
