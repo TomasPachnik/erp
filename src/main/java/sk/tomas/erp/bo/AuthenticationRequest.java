@@ -1,4 +1,4 @@
-package sk.tomas.erp.config;
+package sk.tomas.erp.bo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
