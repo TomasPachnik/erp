@@ -11,7 +11,7 @@ import sk.tomas.erp.bo.User;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
-import sk.tomas.erp.repository.UserRepository;
+import sk.tomas.erp.repository.UsersRepository;
 import sk.tomas.erp.service.UserService;
 
 import java.lang.reflect.Type;
@@ -23,17 +23,17 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private ModelMapper mapper;
-    private UserRepository userRepository;
+    private UsersRepository usersRepository;
 
     @Autowired
-    public UserServiceImpl(ModelMapper mapper, UserRepository userRepository) {
+    public UserServiceImpl(ModelMapper mapper, UsersRepository usersRepository) {
         this.mapper = mapper;
-        this.userRepository = userRepository;
+        this.usersRepository = usersRepository;
     }
 
     @Override
     public List<User> all() {
-        List<UserEntity> all = userRepository.findAll();
+        List<UserEntity> all = usersRepository.findAll();
         Type listType = new TypeToken<List<User>>() {
         }.getType();
         return mapper.map(all, listType);
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UUID save(User user) {
         try {
-            return userRepository.save(mapper.map(user, UserEntity.class)).getUuid();
+            return usersRepository.save(mapper.map(user, UserEntity.class)).getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
             throw new SqlException("Cannot save user");
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(UUID uuid) {
-        return userRepository.findById(uuid)
+        return usersRepository.findById(uuid)
                 .map(userEntity -> mapper.map(userEntity, User.class))
                 .orElseThrow(() -> new ResourceNotFoundException(User.class.getSimpleName() + " not found with id " + uuid));
     }
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean delete(UUID uuid) {
         try {
-            userRepository.deleteById(uuid);
+            usersRepository.deleteById(uuid);
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
