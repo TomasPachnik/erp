@@ -14,8 +14,8 @@ public class Invoice extends Base{
     private String invoiceNumber;
     private String currency;
     private User user;
-    private Legal supplier;
-    private Legal customer;
+    private Customer supplier;
+    private Customer customer;
     private BankAccount supplierBankAccount;
     private String supplierVariableSymbol;
     private Date dateOfIssue;

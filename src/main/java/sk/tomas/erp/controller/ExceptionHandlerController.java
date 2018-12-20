@@ -1,7 +1,6 @@
 package sk.tomas.erp.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,11 +13,11 @@ import sk.tomas.erp.exception.SqlException;
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @ControllerAdvice
 public class ExceptionHandlerController implements ErrorController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionHandlerController.class);
     private static final String PATH = "/error";
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
@@ -37,7 +36,7 @@ public class ExceptionHandlerController implements ErrorController {
     @ExceptionHandler(Exception.class)
     public ServerMessage handleAllException(Exception e) {
         UUID uuid = UUID.randomUUID();
-        logger.error(uuid.toString(), e);
+        log.error(uuid.toString(), e);
         return new ServerMessage("InternalServerError", "internal server error, error code: " + uuid);
     }
 

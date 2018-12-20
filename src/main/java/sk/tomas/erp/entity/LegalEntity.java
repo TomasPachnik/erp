@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Table(name = "legal")
 public class LegalEntity extends BaseEntity {
 
+    private boolean supplier;
     private String name;
     private String companyIdentificationNumber;
     private String taxIdentificationNumber;

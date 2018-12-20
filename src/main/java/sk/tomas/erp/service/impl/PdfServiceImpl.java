@@ -1,11 +1,10 @@
 package sk.tomas.erp.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import org.iban4j.Iban;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -13,15 +12,18 @@ import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.exception.PdfGenerateException;
 import sk.tomas.erp.service.PdfService;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class PdfServiceImpl implements PdfService {
 
-    private static Logger logger = LoggerFactory.getLogger(PdfServiceImpl.class);
 
     private final Environment env;
 
@@ -35,7 +37,7 @@ public class PdfServiceImpl implements PdfService {
         try {
             return Files.readAllBytes(privateGeneratePdf(invoice, invoice.getInvoiceNumber()).toPath());
         } catch (JRException | IOException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new PdfGenerateException("Failed to generate PDF!");
         }
     }

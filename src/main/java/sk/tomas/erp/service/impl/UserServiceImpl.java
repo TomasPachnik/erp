@@ -1,9 +1,8 @@
 package sk.tomas.erp.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,10 +18,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-
-    private static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private ModelMapper mapper;
     private UserRepository userRepository;
@@ -46,7 +44,7 @@ public class UserServiceImpl implements UserService {
         try {
             return userRepository.save(mapper.map(user, UserEntity.class)).getUuid();
         } catch (DataIntegrityViolationException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             throw new SqlException("Cannot save user");
         }
     }
