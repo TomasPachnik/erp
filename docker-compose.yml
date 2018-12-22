@@ -1,0 +1,27 @@
+data_postgres:
+    image: busybox
+    volumes:
+     - /var/lib/mysql
+ 
+data_erp:
+    image: busybox
+    volumes:
+     - /tmp/
+erp:
+    image: tomas487/erp:0.1
+    volumes_from:
+     - data_erp
+    links:
+     - postgres
+    ports:
+     - "8080:8080"
+    environment:
+     - DATABASE_NAME=postgres
+     - DATABASE_HOST=postgres:5432
+postgres:
+    image: postgres:10.6
+    volumes_from:
+     - data_postgres
+    environment:
+     - POSTGRES_USERNAME=postgres
+     - POSTGRES_PASSWORD=postgres
