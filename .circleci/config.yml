@@ -1,40 +1,28 @@
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
-#
-version: 2
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  services:
+    - docker
+  java:
+    version: oraclejdk8
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
+dependencies:
+  pre:
+    - docker info
+    - mvn dependency:resolve
+    - mvn clean package
+    - mvn integration-test
+    - docker build -f Dockerfile -t $DOCKER_HUB_USER/$DOCKER_HUB_PROJECT:latest .
 
-    working_directory: ~/repo
+test:
+  post:
+    - docker run -d -p 8080:8080 -t lprates/sbdocker;  sleep 10
+    - curl --retry 10 --retry-delay 5 -v http://localhost:8080
 
-    environment:
-      # Customize the JVM maximum heap limit
-      MAVEN_OPTS: -Xmx3200m
-
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      - run: mvn dependency:go-offline
-
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
-
-      # run tests!
-      - run: mvn clean install -DskipTests
+deployment:
+  hub:
+    branch: [sb-docker-circleci-example]
+    commands:
+      - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER -p $DOCKERHUB_PASS
+      - docker tag DOCKER_HUB_USER/DOCKER_HUB_PROJECT $DOCKER_HUB_USER/DOCKER_HUB_PROJECT:latest
+      - docker push $DOCKER_HUB_USER/DOCKER_HUB_PROJECT:latest
