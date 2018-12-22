@@ -15,7 +15,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }
       - run: mvn clean install -DskipTests
-      - run docker build -f Dockerfile -t $DOCKER_HUB_USER/$DOCKER_HUB_PROJECT:latest .
+      - run: docker build -f Dockerfile -t $DOCKER_HUB_USER/$DOCKER_HUB_PROJECT:latest .
       - deploy:
           name: Push application Docker image
           commands:
