@@ -19,6 +19,6 @@ jobs:
       - run: docker build -f Dockerfile -t $DOCKER_HUB_USER/$DOCKER_HUB_PROJECT:latest .
       - deploy:
           command:  |
-            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER -p $DOCKERHUB_PASS
+            docker login -u $DOCKER_HUB_USER -p $DOCKERHUB_PASS
             docker tag DOCKER_HUB_USER/DOCKER_HUB_PROJECT $DOCKER_HUB_USER/DOCKER_HUB_PROJECT:latest
             docker push $DOCKER_HUB_USER/DOCKER_HUB_PROJECT:latest
