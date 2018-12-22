@@ -20,5 +20,5 @@ jobs:
       - deploy:
           command:  |
             docker login -u $DOCKER_HUB_USER -p $DOCKERHUB_PASS
-            docker tag DOCKER_HUB_USER/DOCKER_HUB_PROJECT $DOCKER_HUB_USER/DOCKER_HUB_PROJECT:latest
-            docker push $DOCKER_HUB_USER/DOCKER_HUB_PROJECT:latest
+            docker tag $DOCKER_HUB_USER/$DOCKER_HUB_PROJECT $DOCKER_HUB_USER/$DOCKER_HUB_PROJECT:latest
+            docker push $DOCKER_HUB_USER/$DOCKER_HUB_PROJECT:latest
