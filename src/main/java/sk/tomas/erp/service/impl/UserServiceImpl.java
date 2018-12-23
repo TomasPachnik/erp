@@ -113,4 +113,19 @@ public class UserServiceImpl implements UserService {
         }
         throw new ResourceNotFoundException("User not found");
     }
+
+    @Override
+    public User getByToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            List<UserEntity> userEntities = usersRepository.find(currentUserName);
+            if (userEntities.size() == 1) {
+                UserEntity userEntity = userEntities.get(0);
+                return mapper.map(userEntity, User.class);
+            }
+        }
+        throw new ResourceNotFoundException("User not found");
+    }
+
 }

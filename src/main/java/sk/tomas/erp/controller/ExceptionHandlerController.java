@@ -27,6 +27,12 @@ public class ExceptionHandlerController implements ErrorController {
         return new ServerMessage("AccessDeniedException", "Forbidden");
     }
 
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ServerMessage accessException(org.springframework.security.access.AccessDeniedException e) {
+        return new ServerMessage("AccessDeniedException", "Forbidden");
+    }
+
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(SqlException.class)
     public ServerMessage sqlException(SqlException e) {

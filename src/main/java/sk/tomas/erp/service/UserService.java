@@ -20,4 +20,7 @@ public interface UserService {
     Result changePassword(ChangePassword changePassword);
 
     User getByLogin(String login);
+
+    User getByToken();
+
 }

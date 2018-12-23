@@ -1,6 +1,7 @@
 package sk.tomas.erp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.ChangePassword;
 import sk.tomas.erp.bo.Result;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class UserController {
 
     private final UserService userService;
@@ -23,21 +25,30 @@ public class UserController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<User> all() {
         return userService.all();
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/get/{uuid}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public User get(@PathVariable UUID uuid) {
         return userService.get(uuid);
     }
 
     @GetMapping("/getByLogin/{login}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public User get(@PathVariable String login) {
         return userService.getByLogin(login);
     }
 
+    @GetMapping("/getByToken")
+    public User get() {
+        return userService.getByToken();
+    }
+
     @GetMapping("/delete/{uuid}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public boolean delete(@PathVariable UUID uuid) {
         return userService.delete(uuid);
     }
@@ -47,7 +58,7 @@ public class UserController {
         return userService.save(user);
     }
 
-    @PostMapping(path = "/changePass")
+    @PostMapping(path = "/changePassword")
     public Result changePass(@RequestBody ChangePassword changePassword) {
         return userService.changePassword(changePassword);
     }
