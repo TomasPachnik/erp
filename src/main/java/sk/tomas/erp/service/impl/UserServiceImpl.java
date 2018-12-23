@@ -21,8 +21,7 @@ import sk.tomas.erp.repository.UsersRepository;
 import sk.tomas.erp.service.UserService;
 
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -50,7 +49,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UUID save(User user) {
         try {
-            return usersRepository.save(mapper.map(user, UserEntity.class)).getUuid();
+            UserEntity userEntity = mapper.map(user, UserEntity.class);
+
+            if (user.getUuid() != null) {
+                Optional<UserEntity> byId = usersRepository.findById(user.getUuid());
+                byId.ifPresent(userEntity1 -> userEntity.setPassword(userEntity1.getPassword()));
+                byId.ifPresent(userEntity1 -> userEntity.setRoles(userEntity1.getRoles()));
+            } else {
+                userEntity.setPassword(passwordEncoder.encode(user.getName() + "a"));
+                userEntity.setRoles(Collections.singletonList("ROLE_USER"));
+            }
+
+            return usersRepository.save(userEntity).getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
             throw new SqlException("Cannot save user");

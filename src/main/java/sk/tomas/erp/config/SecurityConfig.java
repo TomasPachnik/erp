@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/signin").permitAll()
                 //.antMatchers(HttpMethod.GET, "/users/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/customers/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/customers/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider))
