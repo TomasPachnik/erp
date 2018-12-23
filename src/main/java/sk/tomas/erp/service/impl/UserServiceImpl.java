@@ -6,7 +6,13 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sk.tomas.erp.bo.ChangePassword;
+import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
@@ -24,11 +30,13 @@ public class UserServiceImpl implements UserService {
 
     private ModelMapper mapper;
     private UsersRepository usersRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(ModelMapper mapper, UsersRepository usersRepository) {
+    public UserServiceImpl(ModelMapper mapper, UsersRepository usersRepository, PasswordEncoder passwordEncoder) {
         this.mapper = mapper;
         this.usersRepository = usersRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -64,5 +72,23 @@ public class UserServiceImpl implements UserService {
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
+    }
+
+    @Override
+    public Result changePassword(ChangePassword changePassword) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            List<UserEntity> userEntities = usersRepository.find(currentUserName);
+            if (userEntities.size() == 1) {
+                UserEntity userEntity = userEntities.get(0);
+                if (passwordEncoder.matches(changePassword.getOldPassword(), userEntity.getPassword())) {
+                    userEntity.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
+                    usersRepository.save(userEntity);
+                    return new Result(true);
+                }
+            }
+        }
+        return new Result(false);
     }
 }

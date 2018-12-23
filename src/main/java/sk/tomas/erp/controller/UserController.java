@@ -2,6 +2,8 @@ package sk.tomas.erp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sk.tomas.erp.bo.ChangePassword;
+import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.service.UserService;
 
@@ -36,8 +38,13 @@ public class UserController {
     }
 
     @PostMapping(path = "/save")
-    public UUID save(@Valid @RequestBody User user) {
+    public UUID save(@RequestBody User user) {
         return userService.save(user);
+    }
+
+    @PostMapping(path = "/changePass")
+    public Result changePass(@RequestBody ChangePassword changePassword){
+        return userService.changePassword(changePassword);
     }
 
 }

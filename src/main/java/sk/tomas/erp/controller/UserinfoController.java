@@ -1,4 +1,4 @@
-package sk.tomas.erp.config;
+package sk.tomas.erp.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
