@@ -18,4 +18,6 @@ public interface UserService {
     boolean delete(UUID uuid);
 
     Result changePassword(ChangePassword changePassword);
+
+    User getByLogin(String login);
 }

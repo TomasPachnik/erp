@@ -32,6 +32,11 @@ public class UserController {
         return userService.get(uuid);
     }
 
+    @GetMapping("/getByLogin/{login}")
+    public User get(@PathVariable String login) {
+        return userService.getByLogin(login);
+    }
+
     @GetMapping("/delete/{uuid}")
     public boolean delete(@PathVariable UUID uuid) {
         return userService.delete(uuid);
@@ -43,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/changePass")
-    public Result changePass(@RequestBody ChangePassword changePassword){
+    public Result changePass(@RequestBody ChangePassword changePassword) {
         return userService.changePassword(changePassword);
     }
 

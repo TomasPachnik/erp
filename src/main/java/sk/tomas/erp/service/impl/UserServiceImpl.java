@@ -21,7 +21,10 @@ import sk.tomas.erp.repository.UsersRepository;
 import sk.tomas.erp.service.UserService;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -100,5 +103,14 @@ public class UserServiceImpl implements UserService {
             }
         }
         return new Result(false);
+    }
+
+    @Override
+    public User getByLogin(String login) {
+        List<UserEntity> userEntities = usersRepository.find(login);
+        if (userEntities.size() == 1) {
+            return mapper.map(userEntities.get(0), User.class);
+        }
+        throw new ResourceNotFoundException("User not found");
     }
 }
