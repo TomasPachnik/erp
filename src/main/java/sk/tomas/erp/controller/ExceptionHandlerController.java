@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sk.tomas.erp.bo.ServerMessage;
+import sk.tomas.erp.exception.LoginException;
 import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.exception.TokenException;
 
@@ -31,6 +32,11 @@ public class ExceptionHandlerController implements ErrorController {
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ServerMessage accessException(org.springframework.security.access.AccessDeniedException e) {
         return new ServerMessage("AccessDeniedException", "Forbidden");
+    }
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(LoginException.class)
+    public ServerMessage loginException(LoginException e) {
+        return new ServerMessage("LoginException", e.getMessage());
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)

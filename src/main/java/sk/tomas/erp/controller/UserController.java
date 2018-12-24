@@ -47,7 +47,7 @@ public class UserController {
         return userService.getByToken();
     }
 
-    @GetMapping("/delete/{uuid}")
+    @GetMapping("/remove/{uuid}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public boolean delete(@PathVariable UUID uuid) {
         return userService.delete(uuid);
