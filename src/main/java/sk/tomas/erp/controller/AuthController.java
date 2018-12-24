@@ -43,6 +43,12 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @GetMapping("/ping")
+    public String ping() {
+        return "ping works";
+    }
+
+
     @PostMapping("/signin")
     public ResponseEntity signin(@RequestBody AuthenticationRequest data) {
         checkLogin(data);

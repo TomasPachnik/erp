@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
                 byId.ifPresent(userEntity1 -> userEntity.setPassword(userEntity1.getPassword()));
                 byId.ifPresent(userEntity1 -> userEntity.setRoles(userEntity1.getRoles()));
             } else {
-                userEntity.setPassword(passwordEncoder.encode(user.getName() + "a"));
+                userEntity.setPassword(passwordEncoder.encode(user.getLogin() + "a"));
                 userEntity.setRoles(Collections.singletonList("ROLE_USER"));
             }
 
