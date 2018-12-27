@@ -1,6 +1,7 @@
 package sk.tomas.erp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.Customer;
 import sk.tomas.erp.service.LegalService;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/customers")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class CustomerController {
 
     private final LegalService legalService;
@@ -25,12 +27,12 @@ public class CustomerController {
         return legalService.allCustomers();
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/get/{uuid}")
     public Customer get(@PathVariable UUID uuid) {
         return legalService.getCustomer(uuid);
     }
 
-    @GetMapping("/delete/{uuid}")
+    @GetMapping("/remove/{uuid}")
     public boolean delete(@PathVariable UUID uuid) {
         return legalService.delete(uuid);
     }

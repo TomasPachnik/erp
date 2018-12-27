@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.bo.Supplier;
 import sk.tomas.erp.entity.UserEntity;
@@ -64,7 +65,12 @@ public class LegalServiceImpl implements LegalService {
 
     @Override
     public boolean delete(UUID uuid) {
-        return false;
+        try {
+            legalRepository.deleteById(uuid);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     @Override
