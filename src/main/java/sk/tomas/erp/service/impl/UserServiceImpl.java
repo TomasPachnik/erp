@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sk.tomas.erp.annotations.MyLogger;
 import sk.tomas.erp.bo.ChangePassword;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@MyLogger
 public class UserServiceImpl implements UserService {
 
     private ModelMapper mapper;
