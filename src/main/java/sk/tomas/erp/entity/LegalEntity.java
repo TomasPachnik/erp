@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "legal")
-public class LegalEntity extends BaseEntity {
+public class LegalEntity extends OwnerEntity {
 
     private boolean supplier;
     private String name;

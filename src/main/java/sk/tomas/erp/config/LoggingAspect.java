@@ -13,7 +13,7 @@ import java.util.Arrays;
 @Component
 public class LoggingAspect {
 
-    @Around("@within(sk.tomas.erp.annotations.MyLogger) || @annotation(sk.tomas.erp.annotations.MyLogger)")
+    @Around("@within(sk.tomas.erp.annotations.MethodCallLogger) || @annotation(sk.tomas.erp.annotations.MethodCallLogger)")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
 

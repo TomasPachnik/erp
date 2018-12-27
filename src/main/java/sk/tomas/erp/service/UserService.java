@@ -3,6 +3,7 @@ package sk.tomas.erp.service;
 import sk.tomas.erp.bo.ChangePassword;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
+import sk.tomas.erp.entity.UserEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,8 @@ public interface UserService {
     User get(UUID uuid);
 
     boolean delete(UUID uuid);
+
+    UserEntity getLoggedUser();
 
     Result changePassword(ChangePassword changePassword);
 

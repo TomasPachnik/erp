@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sk.tomas.erp.annotations.MyLogger;
 import sk.tomas.erp.bo.ChangePassword;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
@@ -29,7 +28,6 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@MyLogger
 public class UserServiceImpl implements UserService {
 
     private ModelMapper mapper;
@@ -90,19 +88,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result changePassword(ChangePassword changePassword) {
+    public UserEntity getLoggedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             String currentUserName = authentication.getName();
             List<UserEntity> userEntities = usersRepository.find(currentUserName);
             if (userEntities.size() == 1) {
-                UserEntity userEntity = userEntities.get(0);
-                if (passwordEncoder.matches(changePassword.getOldPassword(), userEntity.getPassword())) {
-                    userEntity.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
-                    usersRepository.save(userEntity);
-                    return new Result(true);
-                }
+                return userEntities.get(0);
             }
+        }
+        throw new ResourceNotFoundException("Logged user not found!");
+    }
+
+    @Override
+    public Result changePassword(ChangePassword changePassword) {
+        UserEntity loggedUser = getLoggedUser();
+        if (passwordEncoder.matches(changePassword.getOldPassword(), loggedUser.getPassword())) {
+            loggedUser.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
+            usersRepository.save(loggedUser);
+            return new Result(true);
         }
         return new Result(false);
     }
@@ -118,16 +122,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getByToken() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String currentUserName = authentication.getName();
-            List<UserEntity> userEntities = usersRepository.find(currentUserName);
-            if (userEntities.size() == 1) {
-                UserEntity userEntity = userEntities.get(0);
-                return mapper.map(userEntity, User.class);
-            }
-        }
-        throw new ResourceNotFoundException("User not found");
+        return mapper.map(getLoggedUser(), User.class);
     }
 
 }
