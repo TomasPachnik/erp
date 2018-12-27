@@ -24,9 +24,6 @@ public class InvoiceEntity extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
     private LegalEntity customer;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(unique = true)
-    private BankAccountEntity supplierBankAccount;
     private String supplierVariableSymbol;
     private Date dateOfIssue;
     private Date deliveryDate;
