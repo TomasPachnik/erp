@@ -15,7 +15,7 @@ public class LegalEntity extends OwnerEntity {
     private String taxIdentificationNumber;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
-    private BankAccountEntity supplierBankAccount;
+    private BankAccountEntity bankAccount;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
     private AddressEntity address;

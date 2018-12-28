@@ -9,6 +9,6 @@ public class Legal extends Base {
     private String companyIdentificationNumber;
     private String taxIdentificationNumber;
     private Address address;
-    private BankAccount supplierBankAccount;
+    private BankAccount bankAccount;
 
 }
