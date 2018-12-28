@@ -55,7 +55,11 @@ public class LegalServiceImpl implements LegalService {
 
     @Override
     public Customer getCustomer(UUID uuid) {
-        LegalEntity legalEntity = legalRepository.findByUuid(uuid, userService.getLoggedUser().getUuid());
+        return getCustomer(uuid, userService.getLoggedUser().getUuid());
+    }
+
+    private Customer getCustomer(UUID uuid, UUID owner) {
+        LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner);
         if (legalEntity != null) {
             return mapper.map(legalEntity, Customer.class);
         }
@@ -84,6 +88,7 @@ public class LegalServiceImpl implements LegalService {
     @Override
     public UUID saveCustomer(Customer customer) {
         UserEntity loggedUser = userService.getLoggedUser();
+        getCustomer(customer.getUuid(), userService.getLoggedUser().getUuid());
         try {
             LegalEntity legal = mapper.map(customer, LegalEntity.class);
             legal.setSupplier(false);
