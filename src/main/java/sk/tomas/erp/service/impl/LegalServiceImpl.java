@@ -9,6 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.bo.Customer;
+import sk.tomas.erp.bo.Legal;
 import sk.tomas.erp.bo.Supplier;
 import sk.tomas.erp.entity.LegalEntity;
 import sk.tomas.erp.entity.UserEntity;
@@ -38,45 +39,25 @@ public class LegalServiceImpl implements LegalService {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Customer> allCustomers() {
-        List<LegalEntity> all = legalRepository.all(userService.getLoggedUser().getUuid(), false);
-        Type listType = new TypeToken<List<Customer>>() {
-        }.getType();
-        return mapper.map(all, listType);
+        return (List<Customer>) (List<?>) all(false);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Supplier> allSuppliers() {
-        List<LegalEntity> all = legalRepository.all(userService.getLoggedUser().getUuid(), true);
-        Type listType = new TypeToken<List<Supplier>>() {
-        }.getType();
-        return mapper.map(all, listType);
+        return (List<Supplier>) (List<?>) all(true);
     }
 
     @Override
     public Customer getCustomer(UUID uuid) {
-        return getCustomer(uuid, userService.getLoggedUser().getUuid());
-    }
-
-    private Customer getCustomer(UUID uuid, UUID owner) {
-        LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner, false);
-        if (legalEntity != null) {
-            return mapper.map(legalEntity, Customer.class);
-        }
-        throw new ResourceNotFoundException(Customer.class.getSimpleName() + " not found with id " + uuid);
+        return (Customer) getLegal(uuid, userService.getLoggedUser().getUuid(), Customer.class);
     }
 
     @Override
     public Supplier getSupplier(UUID uuid) {
-        return getSupplier(uuid, userService.getLoggedUser().getUuid());
-    }
-
-    private Supplier getSupplier(UUID uuid, UUID owner) {
-        LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner, true);
-        if (legalEntity != null) {
-            return mapper.map(legalEntity, Supplier.class);
-        }
-        throw new ResourceNotFoundException(Supplier.class.getSimpleName() + " not found with id " + uuid);
+        return (Supplier) getLegal(uuid, userService.getLoggedUser().getUuid(), Supplier.class);
     }
 
     @Override
@@ -101,32 +82,49 @@ public class LegalServiceImpl implements LegalService {
 
     @Override
     public UUID saveCustomer(Customer customer) {
-        UserEntity loggedUser = userService.getLoggedUser();
-        getCustomer(customer.getUuid(), userService.getLoggedUser().getUuid());
-        try {
-            LegalEntity legal = mapper.map(customer, LegalEntity.class);
-            legal.setSupplier(false);
-            legal.setOwner(loggedUser.getUuid());
-            return legalRepository.save(legal).getUuid();
-        } catch (DataIntegrityViolationException e) {
-            log.error(e.getMessage());
-            throw new SqlException("Cannot save customer");
-        }
+        return saveLegal(customer);
     }
 
     @Override
     public UUID saveSupplier(Supplier supplier) {
+        return saveLegal(supplier);
+    }
+
+    private List<Legal> all(boolean supplier) {
+        List<LegalEntity> all = legalRepository.all(userService.getLoggedUser().getUuid(), supplier);
+        Type listType = new TypeToken<List<Legal>>() {
+        }.getType();
+        return mapper.map(all, listType);
+    }
+
+    private UUID saveLegal(Legal legal) {
         UserEntity loggedUser = userService.getLoggedUser();
-        getSupplier(supplier.getUuid(), userService.getLoggedUser().getUuid());
+
+        //if updating entry, check, if updater is owner
+        if (legal.getUuid() != null) {
+            getLegal(legal.getUuid(), userService.getLoggedUser().getUuid(), legal.getClass());
+        }
         try {
-            LegalEntity legal = mapper.map(supplier, LegalEntity.class);
-            legal.setSupplier(true);
-            legal.setOwner(loggedUser.getUuid());
-            return legalRepository.save(legal).getUuid();
+            LegalEntity legalEntity = mapper.map(legal, LegalEntity.class);
+            if (legal.getClass().equals(Supplier.class)) {
+                legalEntity.setSupplier(true);
+            } else {
+                legalEntity.setSupplier(false);
+            }
+            legalEntity.setOwner(loggedUser.getUuid());
+            return legalRepository.save(legalEntity).getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
-            throw new SqlException("Cannot save supplier");
+            throw new SqlException("Cannot save " + legal.getClass().getSimpleName());
         }
+    }
+
+    private Legal getLegal(UUID uuid, UUID owner, Class clazz) {
+        LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner, false);
+        if (legalEntity != null) {
+            return mapper.map(legalEntity, Legal.class);
+        }
+        throw new ResourceNotFoundException(clazz.getSimpleName() + " not found with id " + uuid);
     }
 
 }
