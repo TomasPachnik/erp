@@ -122,7 +122,7 @@ public class LegalServiceImpl implements LegalService {
     private Legal getLegal(UUID uuid, UUID owner, Class clazz) {
         LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner, false);
         if (legalEntity != null) {
-            return mapper.map(legalEntity, Legal.class);
+            return mapper.map(legalEntity, (Type) clazz);
         }
         throw new ResourceNotFoundException(clazz.getSimpleName() + " not found with id " + uuid);
     }
