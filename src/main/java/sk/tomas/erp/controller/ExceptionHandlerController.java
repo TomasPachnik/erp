@@ -23,25 +23,25 @@ public class ExceptionHandlerController implements ErrorController {
 
     private static final String PATH = "/error";
 
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AccessDeniedException.class)
     public ServerMessage businessException(AccessDeniedException e) {
         return new ServerMessage("AccessDeniedException", "Forbidden");
     }
 
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ServerMessage accessException(org.springframework.security.access.AccessDeniedException e) {
         return new ServerMessage("AccessDeniedException", "Forbidden");
     }
 
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(ResourceNotFoundException.class)
     public ServerMessage accessException(ResourceNotFoundException e) {
         return new ServerMessage("AccessDeniedException", "Forbidden");
     }
 
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(LoginException.class)
     public ServerMessage loginException(LoginException e) {
         return new ServerMessage("LoginException", e.getMessage());
@@ -53,7 +53,7 @@ public class ExceptionHandlerController implements ErrorController {
         return new ServerMessage("SqlException", "constraint exception");
     }
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(TokenException.class)
     public ServerMessage tokenException(TokenException e) {
         return new ServerMessage("tokenException", "Expired or invalid JWT token");
