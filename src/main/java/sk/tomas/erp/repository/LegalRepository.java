@@ -11,18 +11,16 @@ import java.util.UUID;
 
 public interface LegalRepository extends JpaRepository<LegalEntity, UUID> {
 
-    @Query("SELECT l FROM LegalEntity l WHERE (l.supplier) = false and l.owner = ?1")
-    List<LegalEntity> allCustomers(UUID owner);
+    @Query("SELECT l FROM LegalEntity l WHERE l.owner = ?1 and (l.supplier) = ?2")
+    List<LegalEntity> all(UUID owner, boolean supplier);
 
-    @Query("SELECT l FROM LegalEntity l WHERE (l.supplier) = true and l.owner = ?1")
-    List<LegalEntity> allSuppliers(UUID owner);
-
-    @Query("SELECT l FROM LegalEntity l WHERE (l.uuid) = ?1 and l.owner = ?2")
-    LegalEntity findByUuid(UUID uuid, UUID owner);
+    @Query("SELECT l FROM LegalEntity l WHERE (l.uuid) = ?1 and l.owner = ?2 and (l.supplier) = ?3")
+    LegalEntity findByUuid(UUID uuid, UUID owner, boolean supplier);
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM LegalEntity l WHERE (l.uuid) = ?1 and l.owner = ?2")
-    void deleteByUuid(UUID uuid, UUID owner);
+    @Query("DELETE FROM LegalEntity l WHERE  (l.uuid) = ?1 and l.owner = ?2 and (l.supplier) = ?3")
+    void deleteByUuid(UUID uuid, UUID owner, boolean supplier);
+
 
 }

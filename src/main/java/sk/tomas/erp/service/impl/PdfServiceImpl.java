@@ -57,7 +57,7 @@ public class PdfServiceImpl implements PdfService {
         Map<String, Object> translations = new HashMap<>();
         JRBeanCollectionDataSource assets = new JRBeanCollectionDataSource(invoice.getAssets());
 
-        Iban iban = Iban.valueOf(invoice.getSupplierBankAccount().getIban());
+        Iban iban = Iban.valueOf(invoice.getSupplier().getSupplierBankAccount().getIban());
 
         translations.put("invoice", env.getProperty("invoice"));
         translations.put("supplier", env.getProperty("supplier"));
@@ -106,7 +106,7 @@ public class PdfServiceImpl implements PdfService {
         params.put("customer.companyIdentificationNumber", translations.get("crn") + " " + invoice.getCustomer().getCompanyIdentificationNumber());
         params.put("customer.taxIdentificationNumber", translations.get("vat") + " " + invoice.getCustomer().getTaxIdentificationNumber());
 
-        params.put("supplierBankAccount.bankName", translations.get("bankName") + " " + invoice.getSupplierBankAccount().getBankName());
+        params.put("supplierBankAccount.bankName", translations.get("bankName") + " " + invoice.getSupplier().getSupplierBankAccount().getBankName());
         params.put("supplierBankAccount.iban", translations.get("iban") + " " + iban.toFormattedString());
 
         params.put("supplierVariableSymbol", translations.get("variableSymbol") + " " + invoice.getSupplierVariableSymbol());

@@ -16,7 +16,11 @@ public interface LegalService {
 
     Supplier getSupplier(UUID uuid);
 
-    boolean delete(UUID uuid);
+    boolean deleteCustomerByUuid(UUID uuid);
+
+    boolean deleteSupplierByUuid(UUID uuid);
 
     UUID saveCustomer(Customer customer);
+
+    UUID saveSupplier(Supplier supplier);
 }

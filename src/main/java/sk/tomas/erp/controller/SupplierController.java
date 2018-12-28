@@ -3,7 +3,7 @@ package sk.tomas.erp.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sk.tomas.erp.bo.Customer;
+import sk.tomas.erp.bo.Supplier;
 import sk.tomas.erp.service.LegalService;
 
 import javax.validation.Valid;
@@ -11,35 +11,35 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/suppliers")
 @PreAuthorize("hasRole('ROLE_USER')")
-public class CustomerController {
+public class SupplierController {
 
     private final LegalService legalService;
 
     @Autowired
-    public CustomerController(LegalService legalService) {
+    public SupplierController(LegalService legalService) {
         this.legalService = legalService;
     }
 
     @GetMapping("/")
-    public List<Customer> all() {
-        return legalService.allCustomers();
+    public List<Supplier> all() {
+        return legalService.allSuppliers();
     }
 
     @GetMapping("/get/{uuid}")
-    public Customer get(@PathVariable UUID uuid) {
-        return legalService.getCustomer(uuid);
+    public Supplier get(@PathVariable UUID uuid) {
+        return legalService.getSupplier(uuid);
     }
 
     @GetMapping("/remove/{uuid}")
     public boolean delete(@PathVariable UUID uuid) {
-        return legalService.deleteCustomerByUuid(uuid);
+        return legalService.deleteSupplierByUuid(uuid);
     }
 
     @PostMapping(path = "/save")
-    public UUID save(@Valid @RequestBody Customer customer) {
-        return legalService.saveCustomer(customer);
+    public UUID save(@Valid @RequestBody Supplier supplier) {
+        return legalService.saveSupplier(supplier);
     }
 
 }

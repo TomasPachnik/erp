@@ -8,11 +8,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
+import sk.tomas.erp.bo.Customer;
 import sk.tomas.erp.bo.Supplier;
+import sk.tomas.erp.entity.LegalEntity;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
-import sk.tomas.erp.bo.Customer;
-import sk.tomas.erp.entity.LegalEntity;
 import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.repository.LegalRepository;
 import sk.tomas.erp.service.LegalService;
@@ -39,7 +39,7 @@ public class LegalServiceImpl implements LegalService {
 
     @Override
     public List<Customer> allCustomers() {
-        List<LegalEntity> all = legalRepository.allCustomers(userService.getLoggedUser().getUuid());
+        List<LegalEntity> all = legalRepository.all(userService.getLoggedUser().getUuid(), false);
         Type listType = new TypeToken<List<Customer>>() {
         }.getType();
         return mapper.map(all, listType);
@@ -47,7 +47,7 @@ public class LegalServiceImpl implements LegalService {
 
     @Override
     public List<Supplier> allSuppliers() {
-        List<LegalEntity> all = legalRepository.allSuppliers(userService.getLoggedUser().getUuid());
+        List<LegalEntity> all = legalRepository.all(userService.getLoggedUser().getUuid(), true);
         Type listType = new TypeToken<List<Supplier>>() {
         }.getType();
         return mapper.map(all, listType);
@@ -59,7 +59,7 @@ public class LegalServiceImpl implements LegalService {
     }
 
     private Customer getCustomer(UUID uuid, UUID owner) {
-        LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner);
+        LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner, false);
         if (legalEntity != null) {
             return mapper.map(legalEntity, Customer.class);
         }
@@ -68,7 +68,11 @@ public class LegalServiceImpl implements LegalService {
 
     @Override
     public Supplier getSupplier(UUID uuid) {
-        LegalEntity legalEntity = legalRepository.findByUuid(uuid, userService.getLoggedUser().getUuid());
+        return getSupplier(uuid, userService.getLoggedUser().getUuid());
+    }
+
+    private Supplier getSupplier(UUID uuid, UUID owner) {
+        LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner, true);
         if (legalEntity != null) {
             return mapper.map(legalEntity, Supplier.class);
         }
@@ -76,9 +80,19 @@ public class LegalServiceImpl implements LegalService {
     }
 
     @Override
-    public boolean delete(UUID uuid) {
+    public boolean deleteCustomerByUuid(UUID uuid) {
         try {
-            legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid());
+            legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), false);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteSupplierByUuid(UUID uuid) {
+        try {
+            legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), true);
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
@@ -97,6 +111,21 @@ public class LegalServiceImpl implements LegalService {
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
             throw new SqlException("Cannot save customer");
+        }
+    }
+
+    @Override
+    public UUID saveSupplier(Supplier supplier) {
+        UserEntity loggedUser = userService.getLoggedUser();
+        getSupplier(supplier.getUuid(), userService.getLoggedUser().getUuid());
+        try {
+            LegalEntity legal = mapper.map(supplier, LegalEntity.class);
+            legal.setSupplier(true);
+            legal.setOwner(loggedUser.getUuid());
+            return legalRepository.save(legal).getUuid();
+        } catch (DataIntegrityViolationException e) {
+            log.error(e.getMessage());
+            throw new SqlException("Cannot save supplier");
         }
     }
 
