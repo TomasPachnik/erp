@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "invoice")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class InvoiceEntity extends BaseEntity {
+public class InvoiceEntity extends OwnerEntity {
 
     private String name;
     private String invoiceNumber;

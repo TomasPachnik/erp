@@ -12,4 +12,8 @@ public interface InvoiceService {
     List<Invoice> all();
 
     byte[] generatePdf(UUID uuid);
+
+    boolean deleteByUuid(UUID uuid);
+
+    UUID save(Invoice invoice);
 }

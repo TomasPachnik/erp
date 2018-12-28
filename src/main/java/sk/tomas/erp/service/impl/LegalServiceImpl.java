@@ -62,22 +62,12 @@ public class LegalServiceImpl implements LegalService {
 
     @Override
     public boolean deleteCustomerByUuid(UUID uuid) {
-        try {
-            legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), false);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
+        return deleteByUuid(uuid, false);
     }
 
     @Override
     public boolean deleteSupplierByUuid(UUID uuid) {
-        try {
-            legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), true);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
+        return deleteByUuid(uuid, true);
     }
 
     @Override
@@ -125,6 +115,15 @@ public class LegalServiceImpl implements LegalService {
             return mapper.map(legalEntity, (Type) clazz);
         }
         throw new ResourceNotFoundException(clazz.getSimpleName() + " not found with id " + uuid);
+    }
+
+    private boolean deleteByUuid(UUID uuid, boolean supplier) {
+        try {
+            legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
 }

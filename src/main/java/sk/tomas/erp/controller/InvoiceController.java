@@ -5,19 +5,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.PdfService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/invoices")
+@PreAuthorize("hasRole('ROLE_USER')")
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
@@ -29,7 +29,7 @@ public class InvoiceController {
         this.pdfService = pdfService;
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/get/{uuid}")
     public Invoice get(@PathVariable UUID uuid) {
         return invoiceService.get(uuid);
     }
@@ -39,12 +39,20 @@ public class InvoiceController {
         return invoiceService.all();
     }
 
+    @GetMapping("/remove/{uuid}")
+    public boolean delete(@PathVariable UUID uuid) {
+        return invoiceService.deleteByUuid(uuid);
+    }
+
+    @PostMapping(path = "/save")
+    public UUID save(@Valid @RequestBody Invoice invoice) {
+        return invoiceService.save(invoice);
+    }
+
     @GetMapping(path = "/generate/{uuid}", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> generateInvoice(@PathVariable UUID uuid) {
-
         Invoice invoice = get(uuid);
         byte[] generatedPdf = pdfService.generatePdf(invoice);
-
         return new ResponseEntity<>(generatedPdf, generatePdfHeaders(invoice.getInvoiceNumber()), HttpStatus.OK);
     }
 
