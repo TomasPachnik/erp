@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import sk.tomas.erp.bo.ServerMessage;
 import sk.tomas.erp.exception.LoginException;
 import sk.tomas.erp.exception.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 @Slf4j
+@RestController
 @ControllerAdvice
 public class ExceptionHandlerController implements ErrorController {
 
