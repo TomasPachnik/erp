@@ -8,12 +8,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.bo.Invoice;
+import sk.tomas.erp.bo.InvoiceInput;
 import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.repository.InvoiceRepository;
 import sk.tomas.erp.service.InvoiceService;
+import sk.tomas.erp.service.LegalService;
 import sk.tomas.erp.service.PdfService;
 
 import java.lang.reflect.Type;
@@ -28,13 +30,15 @@ public class InvoiceServiceImpl implements InvoiceService {
     private PdfService pdfService;
     private final UserServiceImpl userService;
     private InvoiceRepository invoiceRepository;
+    private final LegalService legalService;
 
     @Autowired
-    public InvoiceServiceImpl(ModelMapper mapper, PdfService pdfService, InvoiceRepository invoiceRepository, UserServiceImpl userService) {
+    public InvoiceServiceImpl(ModelMapper mapper, PdfService pdfService, InvoiceRepository invoiceRepository, UserServiceImpl userService, LegalService legalService) {
         this.mapper = mapper;
         this.pdfService = pdfService;
         this.invoiceRepository = invoiceRepository;
         this.userService = userService;
+        this.legalService = legalService;
     }
 
     @Override
@@ -66,20 +70,25 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public UUID save(Invoice invoice) {
+    public UUID save(InvoiceInput invoiceInput) {
         UserEntity loggedUser = userService.getLoggedUser();
 
         //if updating entry, check, if updater is owner
-        if (invoice.getUuid() != null) {
-            getInvoice(invoice.getUuid(), userService.getLoggedUser().getUuid());
+        if (invoiceInput.getUuid() != null) {
+            getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
         }
+        Invoice invoice = mapper.map(invoiceInput, Invoice.class);
+        invoice.setUser(userService.get(invoiceInput.getUser()));
+        invoice.setCustomer(legalService.getCustomer(invoiceInput.getCustomer()));
+        invoice.setSupplier(legalService.getSupplier(invoiceInput.getSupplier()));
+
+        InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
         try {
-            InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
             invoiceEntity.setOwner(loggedUser.getUuid());
             return invoiceRepository.save(invoiceEntity).getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
-            throw new SqlException("Cannot save " + invoice.getClass().getSimpleName());
+            throw new SqlException("Cannot save " + invoiceInput.getClass().getSimpleName());
         }
     }
 

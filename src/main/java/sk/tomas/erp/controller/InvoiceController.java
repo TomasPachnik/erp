@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.Invoice;
+import sk.tomas.erp.bo.InvoiceInput;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.PdfService;
 
@@ -45,7 +46,7 @@ public class InvoiceController {
     }
 
     @PostMapping(path = "/save")
-    public UUID save(@Valid @RequestBody Invoice invoice) {
+    public UUID save(@Valid @RequestBody InvoiceInput invoice) {
         return invoiceService.save(invoice);
     }
 
