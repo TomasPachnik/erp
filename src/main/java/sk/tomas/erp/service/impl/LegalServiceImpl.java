@@ -110,7 +110,12 @@ public class LegalServiceImpl implements LegalService {
     }
 
     private Legal getLegal(UUID uuid, UUID owner, Class clazz) {
-        LegalEntity legalEntity = legalRepository.findByUuid(uuid, owner, false);
+        LegalEntity legalEntity;
+        if (clazz == Supplier.class) {
+            legalEntity = legalRepository.findByUuid(uuid, owner, true);
+        } else {
+            legalEntity = legalRepository.findByUuid(uuid, owner, false);
+        }
         if (legalEntity != null) {
             return mapper.map(legalEntity, (Type) clazz);
         }
