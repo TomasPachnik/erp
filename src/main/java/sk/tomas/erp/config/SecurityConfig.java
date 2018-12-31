@@ -44,6 +44,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
+                //swagger - https://localhost:8443/swagger-ui.html
+                .antMatchers("/webjars/**").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/v2/**").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/**").hasAnyRole("USER", "ADMIN")
                 //.antMatchers( "/**").hasRole("USER")
                 .anyRequest().authenticated()
