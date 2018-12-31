@@ -78,11 +78,10 @@ public class InvoiceServiceImpl implements InvoiceService {
             getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
         }
         Invoice invoice = mapper.map(invoiceInput, Invoice.class);
-        invoice.setUser(userService.get(invoiceInput.getUser()));
         invoice.setCustomer(legalService.getCustomer(invoiceInput.getCustomer()));
         invoice.setSupplier(legalService.getSupplier(invoiceInput.getSupplier()));
-
         InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
+        invoiceEntity.setUser(userService.getLoggedUser());
         try {
             invoiceEntity.setOwner(loggedUser.getUuid());
             return invoiceRepository.save(invoiceEntity).getUuid();

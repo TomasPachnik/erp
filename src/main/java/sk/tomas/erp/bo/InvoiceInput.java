@@ -12,7 +12,6 @@ public class InvoiceInput extends Base {
     private String name;
     private String invoiceNumber;
     private String currency;
-    private UUID user;
     private UUID supplier;
     private UUID customer;
     private String supplierVariableSymbol;
