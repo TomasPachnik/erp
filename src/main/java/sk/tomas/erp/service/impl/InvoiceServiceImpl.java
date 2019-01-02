@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
 import sk.tomas.erp.entity.InvoiceEntity;
@@ -15,10 +14,14 @@ import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.repository.InvoiceRepository;
+import sk.tomas.erp.repository.LegalRepository;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.LegalService;
 import sk.tomas.erp.service.PdfService;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
@@ -32,14 +35,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final UserServiceImpl userService;
     private InvoiceRepository invoiceRepository;
     private final LegalService legalService;
+    private final LegalRepository legalRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
-    public InvoiceServiceImpl(ModelMapper mapper, PdfService pdfService, InvoiceRepository invoiceRepository, UserServiceImpl userService, LegalService legalService) {
+    public InvoiceServiceImpl(ModelMapper mapper, PdfService pdfService, InvoiceRepository invoiceRepository, UserServiceImpl userService, LegalService legalService, LegalRepository legalRepository) {
         this.mapper = mapper;
         this.pdfService = pdfService;
         this.invoiceRepository = invoiceRepository;
         this.userService = userService;
         this.legalService = legalService;
+        this.legalRepository = legalRepository;
     }
 
     @Override
@@ -70,7 +77,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
 
+
     @Override
+    @Transactional
     public UUID save(InvoiceInput invoiceInput) {
         UserEntity loggedUser = userService.getLoggedUser();
 
@@ -79,15 +88,14 @@ public class InvoiceServiceImpl implements InvoiceService {
             getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
         }
         Invoice invoice = mapper.map(invoiceInput, Invoice.class);
-        invoice.setCustomer(legalService.getCustomer(invoiceInput.getCustomer()));
-        invoice.setSupplier(legalService.getSupplier(invoiceInput.getSupplier()));
         InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
-        invoiceEntity.getCustomer().setSupplierFlag(false);
-        invoiceEntity.getSupplier().setSupplierFlag(true);
+        invoiceEntity.setSupplier(legalRepository.getOne(invoiceInput.getSupplier()));
+        invoiceEntity.setCustomer(legalRepository.getOne(invoiceInput.getCustomer()));
         invoiceEntity.setUser(userService.getLoggedUser());
         try {
             invoiceEntity.setOwner(loggedUser.getUuid());
-            return invoiceRepository.save(invoiceEntity).getUuid();
+            InvoiceEntity merge = entityManager.merge(invoiceEntity);
+            return merge.getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
             throw new SqlException("Cannot save " + invoiceInput.getClass().getSimpleName());

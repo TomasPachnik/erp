@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,6 +17,7 @@ import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.LegalService;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -49,6 +51,7 @@ public class ErpApplicationTests {
     }
 
     @Test
+    @Transactional
     @WithMockUser(username = "admin", authorities = {"ADMIN", "USER"})
     public void invoiceSaveTest() {
         Supplier supplier = new Supplier();
@@ -57,8 +60,8 @@ public class ErpApplicationTests {
         Customer customer = new Customer();
         customer.setName("cust");
 
-        UUID supplierUuid = UUID.fromString("602e5fb3-d4c5-43ab-9eb7-a4b2750e43a2");
-        UUID customerUuid = UUID.fromString("d8817b1a-e5a0-41d1-8ebb-ebf680f94e2e");
+        UUID supplierUuid = legalService.saveSupplier(supplier);
+        UUID customerUuid = legalService.saveCustomer(customer);
 
         InvoiceInput input = new InvoiceInput();
         input.setSupplier(supplierUuid);
