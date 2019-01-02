@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
 import sk.tomas.erp.entity.InvoiceEntity;
@@ -81,6 +82,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setCustomer(legalService.getCustomer(invoiceInput.getCustomer()));
         invoice.setSupplier(legalService.getSupplier(invoiceInput.getSupplier()));
         InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
+        invoiceEntity.getCustomer().setSupplierFlag(false);
+        invoiceEntity.getSupplier().setSupplierFlag(true);
         invoiceEntity.setUser(userService.getLoggedUser());
         try {
             invoiceEntity.setOwner(loggedUser.getUuid());

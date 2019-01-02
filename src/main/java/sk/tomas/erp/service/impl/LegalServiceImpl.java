@@ -97,9 +97,9 @@ public class LegalServiceImpl implements LegalService {
         try {
             LegalEntity legalEntity = mapper.map(legal, LegalEntity.class);
             if (legal.getClass().equals(Supplier.class)) {
-                legalEntity.setSupplier(true);
+                legalEntity.setSupplierFlag(true);
             } else {
-                legalEntity.setSupplier(false);
+                legalEntity.setSupplierFlag(false);
             }
             legalEntity.setOwner(loggedUser.getUuid());
             return legalRepository.save(legalEntity).getUuid();
