@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
 import sk.tomas.erp.entity.InvoiceEntity;
@@ -28,24 +29,23 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@MethodCallLogger
 public class InvoiceServiceImpl implements InvoiceService {
 
     private ModelMapper mapper;
     private PdfService pdfService;
     private final UserServiceImpl userService;
     private InvoiceRepository invoiceRepository;
-    private final LegalService legalService;
     private final LegalRepository legalRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public InvoiceServiceImpl(ModelMapper mapper, PdfService pdfService, InvoiceRepository invoiceRepository, UserServiceImpl userService, LegalService legalService, LegalRepository legalRepository) {
+    public InvoiceServiceImpl(ModelMapper mapper, PdfService pdfService, InvoiceRepository invoiceRepository, UserServiceImpl userService, LegalRepository legalRepository) {
         this.mapper = mapper;
         this.pdfService = pdfService;
         this.invoiceRepository = invoiceRepository;
         this.userService = userService;
-        this.legalService = legalService;
         this.legalRepository = legalRepository;
     }
 
