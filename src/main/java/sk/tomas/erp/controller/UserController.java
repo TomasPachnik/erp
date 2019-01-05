@@ -54,9 +54,12 @@ public class UserController {
     }
 
     @PostMapping(path = "/save")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public UUID save(@RequestBody User user) {
         return userService.save(user);
     }
+
+    //TODO save user without enabled variable and save only with admin privilegies
 
     @PostMapping(path = "/changePassword")
     public Result changePass(@RequestBody ChangePassword changePassword) {
