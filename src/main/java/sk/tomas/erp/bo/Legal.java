@@ -11,4 +11,14 @@ public class Legal extends Base {
     private Address address;
     private BankAccount bankAccount;
 
+    @Override
+    public String toString() {
+        return "Legal{" +
+                "name='" + name + '\'' +
+                ", companyIdentificationNumber='" + companyIdentificationNumber + '\'' +
+                ", taxIdentificationNumber='" + taxIdentificationNumber + '\'' +
+                ", address=" + address +
+                ", bankAccount=" + bankAccount +
+                "} " + super.toString();
+    }
 }
