@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.TokenException;
 
 import javax.annotation.PostConstruct;
@@ -37,10 +38,11 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(String username, List<String> roles) {
+    public String createToken(UserEntity userEntity, List<String> roles) {
 
-        Claims claims = Jwts.claims().setSubject(username);
+        Claims claims = Jwts.claims().setSubject(userEntity.getLogin());
         claims.put("roles", roles);
+        claims.put("name", userEntity.getName());
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);

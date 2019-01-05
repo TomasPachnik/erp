@@ -51,11 +51,11 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity signin(@RequestBody AuthenticationRequest data) {
-        checkLogin(data);
+        UserEntity userEntity = checkLogin(data);
         try {
             String username = data.getUsername();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
-            String token = jwtTokenProvider.createToken(username, this.userRepository.findByLogin(username).orElseThrow(() -> new UsernameNotFoundException("Username " + username + "not found")).getRoles());
+            String token = jwtTokenProvider.createToken(userEntity, this.userRepository.findByLogin(username).orElseThrow(() -> new UsernameNotFoundException("Username " + username + "not found")).getRoles());
 
             Map<Object, Object> model = new HashMap<>();
             model.put("username", username);
@@ -81,13 +81,15 @@ public class AuthController {
         return ok(model);
     }
 
-    private void checkLogin(AuthenticationRequest data) {
+    private UserEntity checkLogin(AuthenticationRequest data) {
         Optional<UserEntity> byLogin = userRepository.findByLogin(data.getUsername());
         if (byLogin.isPresent()) {
             if (!passwordEncoder.matches(data.getPassword(), byLogin.get().getPassword())) {
                 throw new LoginException("Bad credentials");
             }
+            return byLogin.get();
         }
+        return null;
     }
 
 }
