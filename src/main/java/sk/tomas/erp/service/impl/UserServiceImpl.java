@@ -16,8 +16,10 @@ import sk.tomas.erp.bo.ChangeUser;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.entity.UserEntity;
+import sk.tomas.erp.exception.ApplicationRuntimeException;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
+import sk.tomas.erp.exception.ValidationException;
 import sk.tomas.erp.repository.UsersRepository;
 import sk.tomas.erp.service.UserService;
 
@@ -57,6 +59,11 @@ public class UserServiceImpl implements UserService {
 
             if (user.getUuid() != null) {
                 Optional<UserEntity> byId = usersRepository.findById(user.getUuid());
+
+                if ("admin".equals(byId.get().getLogin()) && !"admin".equals(user.getLogin())) {
+                    throw new ValidationException("Cannot change admin username!");
+                }
+
                 byId.ifPresent(userEntity1 -> userEntity.setPassword(userEntity1.getPassword()));
                 byId.ifPresent(userEntity1 -> userEntity.setRoles(userEntity1.getRoles()));
             } else {
