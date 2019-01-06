@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.ChangePassword;
+import sk.tomas.erp.bo.ChangeUser;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.service.UserService;
@@ -59,7 +60,10 @@ public class UserController {
         return userService.save(user);
     }
 
-    //TODO save user without enabled variable and save only with admin privilegies
+    @PostMapping(path = "/saveCurrent")
+    public UUID saveCurrent(@RequestBody ChangeUser changeUser) {
+        return userService.saveCurrent(changeUser);
+    }
 
     @PostMapping(path = "/changePassword")
     public Result changePass(@RequestBody ChangePassword changePassword) {

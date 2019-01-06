@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.bo.ChangePassword;
+import sk.tomas.erp.bo.ChangeUser;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.entity.UserEntity;
@@ -123,6 +124,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByToken() {
         return mapper.map(getLoggedUser(), User.class);
+    }
+
+    @Override
+    public UUID saveCurrent(ChangeUser changeUser) {
+        User byToken = getByToken();
+        byToken.setName(changeUser.getName());
+        byToken.setEmail(changeUser.getEmail());
+        byToken.setPhone(changeUser.getPhone());
+        return save(byToken);
     }
 
 }
