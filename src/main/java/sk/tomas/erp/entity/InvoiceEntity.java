@@ -16,13 +16,13 @@ public class InvoiceEntity extends OwnerEntity {
     private String invoiceNumber;
     private String currency;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(unique = true)
+    @JoinColumn
     private UserEntity user;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(unique = true)
+    @JoinColumn
     private LegalEntity supplier;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(unique = true)
+    @JoinColumn
     private LegalEntity customer;
     private String supplierVariableSymbol;
     private Date dateOfIssue;
