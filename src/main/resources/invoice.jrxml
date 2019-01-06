@@ -204,15 +204,15 @@
 				<textFieldExpression><![CDATA[$P{customer.taxIdentificationNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="380" y="226" width="110" height="16" uuid="85560dba-eb7e-428e-81a4-ae747496738f"/>
+				<reportElement x="390" y="226" width="110" height="16" uuid="85560dba-eb7e-428e-81a4-ae747496738f"/>
 				<textFieldExpression><![CDATA[$P{dateOfIssue}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="380" y="238" width="110" height="16" uuid="0af71d3b-8ab4-4224-86e4-fc30e8c85bcc"/>
+				<reportElement x="390" y="238" width="110" height="16" uuid="0af71d3b-8ab4-4224-86e4-fc30e8c85bcc"/>
 				<textFieldExpression><![CDATA[$P{deliveryDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="380" y="250" width="110" height="16" uuid="cea07cef-e037-4eda-b6e6-9d2acfda6931"/>
+				<reportElement x="390" y="250" width="110" height="16" uuid="cea07cef-e037-4eda-b6e6-9d2acfda6931"/>
 				<textFieldExpression><![CDATA[$P{dueDate}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yyyy">
@@ -397,16 +397,16 @@
 	<pageFooter>
 		<band height="99" splitType="Stretch">
 			<textField>
-				<reportElement x="8" y="50" width="102" height="20" uuid="e31adccb-90dc-4416-ab13-44f5ac7725b9"/>
+				<reportElement x="8" y="50" width="172" height="20" uuid="e31adccb-90dc-4416-ab13-44f5ac7725b9"/>
 				<textFieldExpression><![CDATA[$P{issuer} + " " + $P{issuer.name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="230" y="50" width="102" height="20" uuid="762e0327-ec00-4e53-8ecd-45e358816116"/>
+				<reportElement x="210" y="50" width="140" height="20" uuid="762e0327-ec00-4e53-8ecd-45e358816116"/>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$P{issuer.phone}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="450" y="50" width="94" height="20" uuid="29c6cf71-2d42-4c66-ae9a-c9822c2b8316"/>
+				<reportElement x="380" y="50" width="164" height="20" uuid="29c6cf71-2d42-4c66-ae9a-c9822c2b8316"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$P{issuer.email}]]></textFieldExpression>
 			</textField>
@@ -415,7 +415,7 @@
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{page} + " " + $V{PAGE_NUMBER} + "/" +($V{PAGE_NUMBER}  +  $V{PAGE_COUNT})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{page} + " " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="9" y="70" width="535" height="1" uuid="05512c85-dd96-4f4c-8c4f-a93d5a868b6f"/>
