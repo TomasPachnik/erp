@@ -61,7 +61,11 @@ public class UserServiceImpl implements UserService {
                 Optional<UserEntity> byId = usersRepository.findById(user.getUuid());
 
                 if ("admin".equals(byId.get().getLogin()) && !"admin".equals(user.getLogin())) {
-                    throw new ValidationException("Cannot change admin username!");
+                    throw new ValidationException("Admin username can not be changed!");
+                }
+
+                if ("admin".equals(user.getLogin()) && !user.isEnabled()) {
+                    throw new ValidationException("Admin account can not be disabled!");
                 }
 
                 byId.ifPresent(userEntity1 -> userEntity.setPassword(userEntity1.getPassword()));
