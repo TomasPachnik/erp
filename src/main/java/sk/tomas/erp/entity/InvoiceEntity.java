@@ -28,7 +28,7 @@ public class InvoiceEntity extends OwnerEntity {
     private Date dateOfIssue;
     private Date deliveryDate;
     private Date dueDate;
-    @OneToMany(cascade = {CascadeType.ALL})
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<AssetEntity> assets;
     private String note;
 

@@ -82,7 +82,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Transactional
     public UUID save(InvoiceInput invoiceInput) {
         UserEntity loggedUser = userService.getLoggedUser();
-
         //if updating entry, check, if updater is owner
         if (invoiceInput.getUuid() != null) {
             getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());

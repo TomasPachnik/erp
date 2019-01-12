@@ -65,9 +65,9 @@ public class UserServiceImpl implements UserService {
 
                     if ("admin".equals(byId.get().getLogin()) && !user.isEnabled()) {
                         throw new ValidationException("Admin account can not be disabled!");
-                    } else {
-                        throw new ResourceNotFoundException("User can not be updated!");
                     }
+                } else {
+                    throw new ResourceNotFoundException("User can not be updated!");
                 }
 
                 byId.ifPresent(userEntity1 -> userEntity.setPassword(userEntity1.getPassword()));

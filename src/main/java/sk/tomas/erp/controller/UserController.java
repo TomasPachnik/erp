@@ -9,7 +9,6 @@ import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.User;
 import sk.tomas.erp.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
