@@ -10,22 +10,25 @@ import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
+import sk.tomas.erp.entity.AssetEntity;
 import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
+import sk.tomas.erp.repository.AssetRepository;
 import sk.tomas.erp.repository.InvoiceRepository;
 import sk.tomas.erp.repository.LegalRepository;
 import sk.tomas.erp.service.InvoiceService;
-import sk.tomas.erp.service.LegalService;
-import sk.tomas.erp.service.PdfService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static sk.tomas.erp.util.Utils.entitiesToUuids;
 
 @Slf4j
 @Service
@@ -33,20 +36,20 @@ import java.util.UUID;
 public class InvoiceServiceImpl implements InvoiceService {
 
     private ModelMapper mapper;
-    private PdfService pdfService;
     private final UserServiceImpl userService;
     private InvoiceRepository invoiceRepository;
     private final LegalRepository legalRepository;
+    private final AssetRepository assetRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public InvoiceServiceImpl(ModelMapper mapper, PdfService pdfService, InvoiceRepository invoiceRepository, UserServiceImpl userService, LegalRepository legalRepository) {
+    public InvoiceServiceImpl(ModelMapper mapper, InvoiceRepository invoiceRepository, UserServiceImpl userService, LegalRepository legalRepository, AssetRepository assetRepository) {
         this.mapper = mapper;
-        this.pdfService = pdfService;
         this.invoiceRepository = invoiceRepository;
         this.userService = userService;
         this.legalRepository = legalRepository;
+        this.assetRepository = assetRepository;
     }
 
     @Override
@@ -63,20 +66,17 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public byte[] generatePdf(UUID uuid) {
-        return pdfService.generatePdf(get(uuid));
-    }
-
-    @Override
     public boolean deleteByUuid(UUID uuid) {
         try {
+            List<AssetEntity> assets = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid()).getAssets();
+            List<UUID> uuids = entitiesToUuids(assets);
             invoiceRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid());
+            assetRepository.deleteByUuid(uuids);
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
     }
-
 
     @Override
     @Transactional

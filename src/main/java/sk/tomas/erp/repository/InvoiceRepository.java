@@ -19,7 +19,7 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM InvoiceEntity l WHERE  (l.uuid) = ?1 and l.owner = ?2   ")
+    @Query("DELETE FROM InvoiceEntity l WHERE  (l.uuid) = ?1 and l.owner = ?2")
     void deleteByUuid(UUID uuid, UUID owner);
 
 }
