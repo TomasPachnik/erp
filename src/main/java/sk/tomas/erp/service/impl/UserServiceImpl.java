@@ -21,12 +21,15 @@ import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.exception.ValidationException;
 import sk.tomas.erp.repository.UsersRepository;
 import sk.tomas.erp.service.UserService;
+import sk.tomas.erp.validator.UserServiceValidator;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static sk.tomas.erp.validator.UserServiceValidator.*;
 
 @Slf4j
 @Service
@@ -53,6 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UUID save(User user) {
+        validateInput(user);
         try {
             UserEntity userEntity = mapper.map(user, UserEntity.class);
 
@@ -86,6 +90,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(UUID uuid) {
+        validateUuid(uuid);
         return usersRepository.findById(uuid)
                 .map(userEntity -> mapper.map(userEntity, User.class))
                 .orElseThrow(() -> new ResourceNotFoundException(User.class.getSimpleName() + " not found with id " + uuid));
@@ -93,6 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean delete(UUID uuid) {
+        validateUuid(uuid);
         try {
             usersRepository.deleteById(uuid);
             return true;
@@ -116,6 +122,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result changePassword(ChangePassword changePassword) {
+        validatePassword(changePassword);
         UserEntity loggedUser = getLoggedUser();
         if (passwordEncoder.matches(changePassword.getOldPassword(), loggedUser.getPassword())) {
             loggedUser.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
@@ -127,6 +134,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getByLogin(String login) {
+        validateLogin(login);
         List<UserEntity> userEntities = usersRepository.find(login);
         if (userEntities.size() == 1) {
             return mapper.map(userEntities.get(0), User.class);
@@ -141,6 +149,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UUID saveCurrent(ChangeUser changeUser) {
+        UserServiceValidator.validateInput(changeUser);
         User byToken = getByToken();
         byToken.setName(changeUser.getName());
         byToken.setEmail(changeUser.getEmail());

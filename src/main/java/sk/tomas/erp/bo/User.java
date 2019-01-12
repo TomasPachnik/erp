@@ -2,7 +2,6 @@ package sk.tomas.erp.bo;
 
 import lombok.Data;
 
-
 @Data
 public class User extends Base {
 
