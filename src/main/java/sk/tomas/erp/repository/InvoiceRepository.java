@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
 
-    @Query("SELECT l FROM InvoiceEntity l WHERE l.owner = ?1")
+    @Query("SELECT l FROM InvoiceEntity l WHERE l.owner = ?1 order by l.invoiceNumber asc")
     List<InvoiceEntity> all(UUID owner);
 
     @Query("SELECT l FROM InvoiceEntity l WHERE (l.uuid) = ?1 and l.owner = ?2")
