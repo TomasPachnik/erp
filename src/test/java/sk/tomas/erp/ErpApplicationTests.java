@@ -5,14 +5,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
-import sk.tomas.erp.bo.Customer;
-import sk.tomas.erp.bo.Invoice;
-import sk.tomas.erp.bo.InvoiceInput;
-import sk.tomas.erp.bo.Supplier;
+import sk.tomas.erp.bo.*;
 import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.LegalService;
@@ -20,6 +18,7 @@ import sk.tomas.erp.service.LegalService;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RunWith(SpringRunner.class)
@@ -69,6 +68,14 @@ public class ErpApplicationTests {
 
         invoiceService.save(input);
 
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "admin", authorities = {"ADMIN", "USER"})
+    public void paginationTest(){
+        Page all = invoiceService.all(new PagingInput(0, 1));
+        System.out.println(all.getContent().size());
     }
 
 }

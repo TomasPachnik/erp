@@ -1,6 +1,7 @@
 package sk.tomas.erp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
+import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.PdfService;
 
@@ -40,13 +42,18 @@ public class InvoiceController {
         return invoiceService.all();
     }
 
+    @PostMapping(path = "/all")
+    public Page all(@RequestBody PagingInput input) {
+        return invoiceService.all(input);
+    }
+
     @GetMapping("/remove/{uuid}")
     public boolean delete(@PathVariable UUID uuid) {
         return invoiceService.deleteByUuid(uuid);
     }
 
     @PostMapping(path = "/save")
-    public UUID save(@Valid @RequestBody InvoiceInput invoice) {
+    public UUID save(@RequestBody InvoiceInput invoice) {
         return invoiceService.save(invoice);
     }
 

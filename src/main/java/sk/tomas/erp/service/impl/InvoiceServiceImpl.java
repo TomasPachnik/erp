@@ -6,10 +6,13 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
+import sk.tomas.erp.bo.JpaPageable;
+import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.entity.AssetEntity;
 import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.entity.UserEntity;
@@ -30,6 +33,7 @@ import java.util.UUID;
 import static sk.tomas.erp.util.Utils.entitiesToUuids;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 import static sk.tomas.erp.validator.InvoiceServiceValidator.validateInvoice;
+import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput;
 
 @Slf4j
 @Service
@@ -64,6 +68,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         Type listType = new TypeToken<List<Invoice>>() {
         }.getType();
         return mapper.map(all, listType);
+    }
+
+    @Override
+    public Page all(PagingInput input) {
+        validatePagingInput(input);
+        return invoiceRepository.findByOwner(userService.getLoggedUser().getUuid(),
+                new JpaPageable(input.getPageIndex(), input.getPageSize()));
     }
 
     @Override

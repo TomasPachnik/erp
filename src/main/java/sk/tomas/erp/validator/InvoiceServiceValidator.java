@@ -2,8 +2,20 @@ package sk.tomas.erp.validator;
 
 import sk.tomas.erp.bo.Asset;
 import sk.tomas.erp.bo.InvoiceInput;
+import sk.tomas.erp.bo.PagingInput;
+import sk.tomas.erp.exception.InputValidationException;
 
 public class InvoiceServiceValidator {
+
+    public static void validatePagingInput(PagingInput input) {
+        BaseValidator.validateNull(input, "input");
+        if (input.getPageIndex() < 0) {
+            throw new InputValidationException("Page index can not be negative number.");
+        }
+        if (input.getPageSize() <= 0) {
+            throw new InputValidationException("Page index have to be positive number.");
+        }
+    }
 
     public static void validateInvoice(InvoiceInput invoice) {
         BaseValidator.validateNull(invoice, invoice.getClass().getSimpleName());
