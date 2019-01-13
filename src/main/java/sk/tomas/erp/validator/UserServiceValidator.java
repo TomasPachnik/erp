@@ -20,6 +20,7 @@ public class UserServiceValidator {
     public static void validateInput(ChangeUser user) {
         BaseValidator.validateNull(user, user.getClass().getSimpleName());
         validate(user.getName(), user.getEmail());
+        BaseValidator.validateMaxLength(user.getPhone(), 30, "phone number");
     }
 
     public static void validateLogin(String login) {
