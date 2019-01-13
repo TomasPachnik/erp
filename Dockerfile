@@ -1,5 +1,5 @@
 # docker build -f Dockerfile -t tomas487/erp:0.1 .
-FROM alpine:3.1
+FROM alpine:3.5
 MAINTAINER tomas487
 ADD target/erp-0.0.1-SNAPSHOT.jar erp.jar
 EXPOSE 8443
