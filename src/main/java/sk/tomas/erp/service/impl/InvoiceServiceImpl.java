@@ -24,11 +24,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.entitiesToUuids;
+import static sk.tomas.erp.validator.BaseValidator.validateUuid;
+import static sk.tomas.erp.validator.InvoiceServiceValidator.validateInvoice;
 
 @Slf4j
 @Service
@@ -81,6 +82,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional
     public UUID save(InvoiceInput invoiceInput) {
+        validateInvoice(invoiceInput);
         UserEntity loggedUser = userService.getLoggedUser();
         //if updating entry, check, if updater is owner
         if (invoiceInput.getUuid() != null) {
@@ -102,6 +104,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private Invoice getInvoice(UUID uuid, UUID owner) {
+        validateUuid(uuid);
         InvoiceEntity invoiceEntity = invoiceRepository.findByUuid(uuid, owner);
         if (invoiceEntity != null) {
             return mapper.map(invoiceEntity, Invoice.class);

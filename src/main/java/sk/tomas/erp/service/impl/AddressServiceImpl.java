@@ -4,15 +4,17 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.bo.Address;
 import sk.tomas.erp.entity.AddressEntity;
+import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.repository.AddressRepository;
 import sk.tomas.erp.service.AddressService;
 
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
+
+import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -28,6 +30,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public Address get(UUID uuid) {
+        validateUuid(uuid);
         return addressRepository.findById(uuid)
                 .map(addressEntity -> mapper.map(addressEntity, Address.class))
                 .orElseThrow(() -> new ResourceNotFoundException(Address.class.getSimpleName() + " not found with id " + uuid));

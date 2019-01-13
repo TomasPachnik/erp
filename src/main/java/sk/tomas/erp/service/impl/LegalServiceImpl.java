@@ -22,6 +22,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
 
+import static sk.tomas.erp.validator.BaseValidator.validateUuid;
+import static sk.tomas.erp.validator.LegalServiceValidator.*;
+
 @Slf4j
 @Service
 @MethodCallLogger
@@ -88,6 +91,7 @@ public class LegalServiceImpl implements LegalService {
     }
 
     private UUID saveLegal(Legal legal) {
+        validateLegal(legal);
         UserEntity loggedUser = userService.getLoggedUser();
 
         //if updating entry, check, if updater is owner
@@ -110,6 +114,7 @@ public class LegalServiceImpl implements LegalService {
     }
 
     private Legal getLegal(UUID uuid, UUID owner, Class clazz) {
+        validateUuid(uuid);
         LegalEntity legalEntity;
         if (clazz == Supplier.class) {
             legalEntity = legalRepository.findByUuid(uuid, owner, true);
@@ -123,6 +128,7 @@ public class LegalServiceImpl implements LegalService {
     }
 
     private boolean deleteByUuid(UUID uuid, boolean supplier) {
+        validateUuid(uuid);
         try {
             legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
             return true;
