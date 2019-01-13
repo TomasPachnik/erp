@@ -7,7 +7,7 @@ import org.springframework.data.domain.Sort;
 
 @Data
 @AllArgsConstructor
-public class JpaPageable implements Pageable {
+public class InvoicesPageable implements Pageable {
 
     private int pageIndex;
     private int pageSize;
@@ -29,7 +29,7 @@ public class JpaPageable implements Pageable {
 
     @Override
     public Sort getSort() {
-        return new Sort(Sort.Direction.ASC, "uuid");
+        return new Sort(Sort.Direction.ASC, "invoiceNumber");
     }
 
     @Override

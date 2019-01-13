@@ -71,10 +71,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     public Paging all(PagingInput input) {
         validatePagingInput(input);
         Page<InvoiceEntity> page = invoiceRepository.findByOwner(userService.getLoggedUser().getUuid(),
-                new JpaPageable(input.getPageIndex(), input.getPageSize()));
+                new InvoicesPageable(input.getPageIndex(), input.getPageSize()));
 
         Paging paging = new Paging();
-        paging.setTotal(page.getTotalPages());
+        paging.setTotal((int) page.getTotalElements());
         paging.setPageable(new PagingInput((int) page.getPageable().getOffset(), page.getPageable().getPageSize()));
         Type listType = new TypeToken<List<Invoice>>() {
         }.getType();
@@ -88,7 +88,9 @@ public class InvoiceServiceImpl implements InvoiceService {
             List<AssetEntity> assets = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid()).getAssets();
             List<UUID> uuids = entitiesToUuids(assets);
             invoiceRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid());
-            assetRepository.deleteByUuid(uuids);
+            if (!uuids.isEmpty()) {
+                assetRepository.deleteByUuid(uuids);
+            }
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
