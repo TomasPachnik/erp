@@ -1,8 +1,8 @@
 package sk.tomas.erp.service;
 
-import org.springframework.data.domain.Page;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
+import sk.tomas.erp.bo.Paging;
 import sk.tomas.erp.bo.PagingInput;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public interface InvoiceService {
 
     List<Invoice> all();
 
-    Page all(PagingInput input);
+    Paging all(PagingInput input);
 
     boolean deleteByUuid(UUID uuid);
 

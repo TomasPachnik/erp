@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
+import sk.tomas.erp.bo.Paging;
 import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.PdfService;
@@ -43,7 +44,7 @@ public class InvoiceController {
     }
 
     @PostMapping(path = "/all")
-    public Page all(@RequestBody PagingInput input) {
+    public Paging all(@RequestBody PagingInput input) {
         return invoiceService.all(input);
     }
 

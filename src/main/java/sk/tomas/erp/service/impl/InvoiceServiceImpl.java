@@ -9,10 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
-import sk.tomas.erp.bo.Invoice;
-import sk.tomas.erp.bo.InvoiceInput;
-import sk.tomas.erp.bo.JpaPageable;
-import sk.tomas.erp.bo.PagingInput;
+import sk.tomas.erp.bo.*;
 import sk.tomas.erp.entity.AssetEntity;
 import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.entity.UserEntity;
@@ -71,10 +68,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Page all(PagingInput input) {
+    public Paging all(PagingInput input) {
         validatePagingInput(input);
-        return invoiceRepository.findByOwner(userService.getLoggedUser().getUuid(),
+        Page<InvoiceEntity> page = invoiceRepository.findByOwner(userService.getLoggedUser().getUuid(),
                 new JpaPageable(input.getPageIndex(), input.getPageSize()));
+
+        Paging paging = new Paging();
+        paging.setTotal(page.getTotalPages());
+        paging.setPageable(new PagingInput((int) page.getPageable().getOffset(), page.getPageable().getPageSize()));
+        Type listType = new TypeToken<List<Invoice>>() {
+        }.getType();
+        paging.setContent(mapper.map(page.getContent(), listType));
+        return paging;
     }
 
     @Override

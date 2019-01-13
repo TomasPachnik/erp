@@ -72,9 +72,9 @@ public class ErpApplicationTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "admin", authorities = {"ADMIN", "USER"})
+    @WithMockUser(username = "tomas", authorities = {"ADMIN", "USER"})
     public void paginationTest(){
-        Page all = invoiceService.all(new PagingInput(0, 1));
+        Paging all = invoiceService.all(new PagingInput(0, 1));
         System.out.println(all.getContent().size());
     }
 
