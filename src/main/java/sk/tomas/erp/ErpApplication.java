@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 public class ErpApplication {
 
     public static void main(String[] args) {
-        System.setProperty("java.awt.headless", "true");
         SpringApplication.run(ErpApplication.class, args);
     }
 
