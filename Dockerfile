@@ -1,5 +1,5 @@
 # docker build -f Dockerfile -t tomas487/erp:0.1 .
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jre
 MAINTAINER tomas487
 VOLUME /tmp
 COPY target/erp-0.0.1-SNAPSHOT.jar erp.jar
