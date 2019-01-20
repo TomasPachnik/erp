@@ -90,6 +90,7 @@ public class AuthController {
         Optional<UserEntity> byLogin = userRepository.findByLogin(data.getUsername());
         if (byLogin.isPresent()) {
             if (!passwordEncoder.matches(data.getPassword(), byLogin.get().getPassword())) {
+                log.info("User " + data.getUsername() + " inserted bad credentials.");
                 throw new LoginException("Bad credentials");
             }
             return byLogin.get();

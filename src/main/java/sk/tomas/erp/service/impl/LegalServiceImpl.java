@@ -147,9 +147,9 @@ public class LegalServiceImpl implements LegalService {
             String name = getLegal(uuid, userService.getLoggedUser().getUuid(), supplier).getName();
             legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
             if (supplier) {
-                log.info("Supplier " + name + " was deleted");
+                log.info("Supplier " + name + " was deleted.");
             } else {
-                log.info("Customer " + name + " was deleted");
+                log.info("Customer " + name + " was deleted.");
             }
             return true;
         } catch (EmptyResultDataAccessException e) {
