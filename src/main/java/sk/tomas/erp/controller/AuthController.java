@@ -65,8 +65,10 @@ public class AuthController {
             log.info("User " + data.getUsername() + " logged in.");
             return ok(model);
         } catch (BadCredentialsException bce) {
+            log.info("User " + data.getUsername() + " inserted bad credentials.");
             throw new LoginException("Bad credentials");
         } catch (DisabledException e) {
+            log.info("User " + data.getUsername() + " tried logged in, but is not active.");
             throw new LoginException("User not active");
         }
     }
