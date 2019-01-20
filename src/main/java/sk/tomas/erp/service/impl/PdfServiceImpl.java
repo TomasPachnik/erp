@@ -35,7 +35,9 @@ public class PdfServiceImpl implements PdfService {
     @Override
     public byte[] generatePdf(Invoice invoice) {
         try {
-            return Files.readAllBytes(privateGeneratePdf(invoice, invoice.getInvoiceNumber()).toPath());
+            byte[] bytes = Files.readAllBytes(privateGeneratePdf(invoice, invoice.getInvoiceNumber()).toPath());
+            log.info("PDF for invoice " + invoice.getName() + " generated.");
+            return bytes;
         } catch (JRException | IOException e) {
             log.error(e.getMessage());
             throw new PdfGenerateException("Failed to generate PDF!");
