@@ -13,10 +13,10 @@ public class LegalEntity extends OwnerEntity {
     private String name;
     private String companyIdentificationNumber;
     private String taxIdentificationNumber;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
     private BankAccountEntity bankAccount;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(unique = true)
     private AddressEntity address;
 

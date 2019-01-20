@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,8 +33,9 @@ public class UserEntity extends BaseEntity implements UserDetails {
     private boolean enabled;
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @Builder.Default
+    @ElementCollection(targetClass=String.class)
     private List<String> roles = new ArrayList<>();
 
     @Override
