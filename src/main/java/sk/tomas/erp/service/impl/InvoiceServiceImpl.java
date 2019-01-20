@@ -1,6 +1,7 @@
 package sk.tomas.erp.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.SerializationUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,9 +92,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Transactional
     public boolean deleteByUuid(UUID uuid) {
         try {
-            Invoice invoice = getInvoice(uuid, userService.getLoggedUser().getUuid());
-            auditService.log(Invoice.class, userService.getLoggedUser().getUuid(), invoice, null);
-            InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
+            InvoiceEntity invoiceEntity = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid());
+            auditService.log(InvoiceEntity.class, userService.getLoggedUser().getUuid(), invoiceEntity, null);
             List<AssetEntity> assets = invoiceEntity.getAssets();
             List<UUID> uuids = entitiesToUuids(assets);
             String name = get(uuid).getName();
@@ -113,10 +113,11 @@ public class InvoiceServiceImpl implements InvoiceService {
     public UUID save(InvoiceInput invoiceInput) {
         validateInvoice(invoiceInput);
         UserEntity loggedUser = userService.getLoggedUser();
-        Invoice oldInvoice = null;
+        InvoiceEntity oldInvoice = null;
         //if updating entry, check, if updater is owner
         if (invoiceInput.getUuid() != null) {
-            oldInvoice = getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
+            oldInvoice = (InvoiceEntity) SerializationUtils.clone(
+                    invoiceRepository.findByUuid(invoiceInput.getUuid(), userService.getLoggedUser().getUuid()));
         }
         Invoice invoice = mapper.map(invoiceInput, Invoice.class);
         InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
@@ -126,8 +127,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         try {
             invoiceEntity.setOwner(loggedUser.getUuid());
             InvoiceEntity merge = entityManager.merge(invoiceEntity);
-            Invoice newInvoice = getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
             log.info("Invoice " + invoiceInput.getName() + " was created/updated.");
+            InvoiceEntity newInvoice = (InvoiceEntity) SerializationUtils.clone(invoiceRepository.getOne(merge.getUuid()));
             auditService.log(InvoiceEntity.class, loggedUser.getUuid(), oldInvoice, newInvoice);
             return merge.getUuid();
         } catch (DataIntegrityViolationException e) {

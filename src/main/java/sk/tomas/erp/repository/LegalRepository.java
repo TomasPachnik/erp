@@ -17,6 +17,9 @@ public interface LegalRepository extends JpaRepository<LegalEntity, UUID> {
     @Query("SELECT l FROM LegalEntity l WHERE (l.uuid) = ?1 and l.owner = ?2 and (l.supplierFlag) = ?3")
     LegalEntity findByUuid(UUID uuid, UUID owner, boolean supplier);
 
+    @Query("SELECT l FROM LegalEntity l WHERE (l.uuid) = ?1 and l.owner = ?2")
+    LegalEntity findByUuid(UUID uuid, UUID owner);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM LegalEntity l WHERE  (l.uuid) = ?1 and l.owner = ?2 and (l.supplierFlag) = ?3")

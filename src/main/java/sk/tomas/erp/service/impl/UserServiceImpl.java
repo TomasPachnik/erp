@@ -1,6 +1,7 @@
 package sk.tomas.erp.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.SerializationUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,14 +65,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UUID save(User user) {
         validateInput(user);
-        User oldUser = null;
+        UserEntity oldUser = null;
         try {
             UserEntity userEntity = mapper.map(user, UserEntity.class);
 
             if (user.getUuid() != null) {
                 Optional<UserEntity> byId = usersRepository.findById(user.getUuid());
                 if (byId.isPresent()) {
-                    oldUser = mapper.map(byId.get(), User.class);
+                    oldUser = (UserEntity) SerializationUtils.clone(byId.get());
                     if ("admin".equals(byId.get().getLogin()) && !"admin".equals(user.getLogin())) {
                         throw new ValidationException("Admin username can not be changed!");
                     }
@@ -91,7 +92,7 @@ public class UserServiceImpl implements UserService {
             }
 
             UUID uuid = usersRepository.save(userEntity).getUuid();
-            auditService.log(User.class, getLoggedUser().getUuid(), oldUser, user);
+            auditService.log(UserEntity.class, getLoggedUser().getUuid(), oldUser, usersRepository.getOne(uuid));
             log.info("User " + user.getLogin() + " was created/updated.");
             return uuid;
         } catch (DataIntegrityViolationException e) {
@@ -113,11 +114,10 @@ public class UserServiceImpl implements UserService {
     public boolean delete(UUID uuid) {
         validateUuid(uuid);
         try {
-            User user = get(uuid);
-            UserEntity userEntity = mapper.map(user, UserEntity.class);
+            UserEntity user = usersRepository.getOne(uuid);
             String login = user.getLogin();
+            auditService.log(UserEntity.class, getLoggedUser().getUuid(), user, null);
             usersRepository.deleteById(uuid);
-            auditService.log(User.class, getLoggedUser().getUuid(), user, null);
             log.info("User " + login + " was deleted.");
             return true;
         } catch (EmptyResultDataAccessException e) {
@@ -142,13 +142,11 @@ public class UserServiceImpl implements UserService {
     public Result changePassword(ChangePassword changePassword) {
         validatePassword(changePassword);
         UserEntity loggedUser = getLoggedUser();
-        User oldUser = mapper.map(loggedUser, User.class);
         if (passwordEncoder.matches(changePassword.getOldPassword(), loggedUser.getPassword())) {
             loggedUser.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             usersRepository.save(loggedUser);
             log.info("User " + loggedUser.getLogin() + " successfully changed password.");
-            User user = getByToken();
-            auditService.log(User.class, loggedUser.getUuid(), oldUser, user);
+            auditService.log(UserEntity.class, loggedUser.getUuid(), loggedUser, usersRepository.getOne(loggedUser.getUuid()));
             return new Result(true);
         }
         log.info("User " + loggedUser.getLogin() + " tried to change password, but was not successful.");
