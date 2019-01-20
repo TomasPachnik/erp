@@ -20,9 +20,11 @@ import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.exception.ValidationException;
 import sk.tomas.erp.repository.UsersRepository;
+import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.UserService;
 import sk.tomas.erp.validator.UserServiceValidator;
 
+import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -39,12 +41,15 @@ public class UserServiceImpl implements UserService {
     private ModelMapper mapper;
     private UsersRepository usersRepository;
     private PasswordEncoder passwordEncoder;
+    private AuditService auditService;
 
     @Autowired
-    public UserServiceImpl(ModelMapper mapper, UsersRepository usersRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(ModelMapper mapper, UsersRepository usersRepository,
+                           PasswordEncoder passwordEncoder, AuditService auditService) {
         this.mapper = mapper;
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
+        this.auditService = auditService;
     }
 
     @Override
@@ -56,14 +61,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UUID save(User user) {
         validateInput(user);
+        User oldUser = null;
         try {
             UserEntity userEntity = mapper.map(user, UserEntity.class);
 
             if (user.getUuid() != null) {
                 Optional<UserEntity> byId = usersRepository.findById(user.getUuid());
                 if (byId.isPresent()) {
+                    oldUser = mapper.map(byId.get(), User.class);
                     if ("admin".equals(byId.get().getLogin()) && !"admin".equals(user.getLogin())) {
                         throw new ValidationException("Admin username can not be changed!");
                     }
@@ -78,11 +86,12 @@ public class UserServiceImpl implements UserService {
                 byId.ifPresent(userEntity1 -> userEntity.setPassword(userEntity1.getPassword()));
                 byId.ifPresent(userEntity1 -> userEntity.setRoles(userEntity1.getRoles()));
             } else {
-                userEntity.setPassword(passwordEncoder.encode(user.getLogin() + "a"));
+                userEntity.setPassword(passwordEncoder.encode(user.getLogin() + "!!!"));
                 userEntity.setRoles(Collections.singletonList("ROLE_USER"));
             }
 
             UUID uuid = usersRepository.save(userEntity).getUuid();
+            auditService.log(User.class, getLoggedUser().getUuid(), oldUser, user);
             log.info("User " + user.getLogin() + " was created/updated.");
             return uuid;
         } catch (DataIntegrityViolationException e) {
@@ -100,11 +109,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public boolean delete(UUID uuid) {
         validateUuid(uuid);
         try {
-            String login = get(uuid).getLogin();
+            User user = get(uuid);
+            UserEntity userEntity = mapper.map(user, UserEntity.class);
+            String login = user.getLogin();
             usersRepository.deleteById(uuid);
+            auditService.log(User.class, getLoggedUser().getUuid(), user, null);
             log.info("User " + login + " was deleted.");
             return true;
         } catch (EmptyResultDataAccessException e) {
@@ -129,10 +142,13 @@ public class UserServiceImpl implements UserService {
     public Result changePassword(ChangePassword changePassword) {
         validatePassword(changePassword);
         UserEntity loggedUser = getLoggedUser();
+        User oldUser = mapper.map(loggedUser, User.class);
         if (passwordEncoder.matches(changePassword.getOldPassword(), loggedUser.getPassword())) {
             loggedUser.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             usersRepository.save(loggedUser);
             log.info("User " + loggedUser.getLogin() + " successfully changed password.");
+            User user = getByToken();
+            auditService.log(User.class, loggedUser.getUuid(), oldUser, user);
             return new Result(true);
         }
         log.info("User " + loggedUser.getLogin() + " tried to change password, but was not successful.");
@@ -155,6 +171,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UUID saveCurrent(ChangeUser changeUser) {
         UserServiceValidator.validateInput(changeUser);
         User byToken = getByToken();

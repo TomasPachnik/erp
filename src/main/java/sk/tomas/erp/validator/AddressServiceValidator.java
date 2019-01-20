@@ -5,7 +5,7 @@ import sk.tomas.erp.bo.Address;
 public class AddressServiceValidator {
 
     public static void validateAddress(Address address) {
-        BaseValidator.validateNull(address, address.getClass().getSimpleName());
+        BaseValidator.validateNull(address, "Address");
         BaseValidator.validateNullOrEmpty(address.getStreet(), "Street");
         BaseValidator.validateMaxLength(address.getStreet(), 60, "street");
         BaseValidator.validateNullOrEmpty(address.getHouseNumber(), "House number");

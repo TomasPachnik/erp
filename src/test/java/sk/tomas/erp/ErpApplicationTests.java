@@ -40,7 +40,6 @@ public class ErpApplicationTests {
         System.out.println();
     }
 
-
     @Test
     public void passwordTest() {
         String password = passwordEncoder.encode("password");

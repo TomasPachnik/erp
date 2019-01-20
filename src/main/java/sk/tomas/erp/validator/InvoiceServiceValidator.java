@@ -8,7 +8,7 @@ import sk.tomas.erp.exception.InputValidationException;
 public class InvoiceServiceValidator {
 
     public static void validatePagingInput(PagingInput input) {
-        BaseValidator.validateNull(input, "input");
+        BaseValidator.validateNull(input, "Input");
         if (input.getPageIndex() < 0) {
             throw new InputValidationException("Page index can not be negative number.");
         }
@@ -18,7 +18,7 @@ public class InvoiceServiceValidator {
     }
 
     public static void validateInvoice(InvoiceInput invoice) {
-        BaseValidator.validateNull(invoice, invoice.getClass().getSimpleName());
+        BaseValidator.validateNull(invoice, "Invoice");
         BaseValidator.validateNullOrEmpty(invoice.getName(), "Name");
         BaseValidator.validateMaxLength(invoice.getName(), 60, "name");
         BaseValidator.validateNullOrEmpty(invoice.getInvoiceNumber(), "Invoice number");

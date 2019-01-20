@@ -12,13 +12,13 @@ public class UserServiceValidator {
     private static final String PASSWORD_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
 
     public static void validateInput(User user) {
-        BaseValidator.validateNull(user, user.getClass().getSimpleName());
+        BaseValidator.validateNull(user, "User");
         validateLogin(user.getLogin());
         validate(user.getName(), user.getEmail());
     }
 
     public static void validateInput(ChangeUser user) {
-        BaseValidator.validateNull(user, user.getClass().getSimpleName());
+        BaseValidator.validateNull(user, "User");
         validate(user.getName(), user.getEmail());
         BaseValidator.validateMaxLength(user.getPhone(), 30, "phone number");
     }

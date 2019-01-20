@@ -11,7 +11,7 @@ import sk.tomas.erp.exception.InputValidationException;
 public class LegalServiceValidator {
 
     public static void validateLegal(Legal legal) {
-        BaseValidator.validateNull(legal, legal.getClass().getSimpleName());
+        BaseValidator.validateNull(legal, "Legal");
         BaseValidator.validateNullOrEmpty(legal.getName(), "Name");
         BaseValidator.validateMaxLength(legal.getName(), 60, "name");
         BaseValidator.validateNullOrEmpty(legal.getCompanyIdentificationNumber(), "Company identification number");
@@ -24,7 +24,7 @@ public class LegalServiceValidator {
 
 
     public static void validateBankAccount(BankAccount account) {
-        BaseValidator.validateNull(account, account.getClass().getSimpleName());
+        BaseValidator.validateNull(account, "BankAccount");
         BaseValidator.validateNullOrEmpty(account.getBankName(), "Bank name");
         BaseValidator.validateMaxLength(account.getBankName(), 30, "bank name");
         try {

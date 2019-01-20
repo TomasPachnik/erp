@@ -16,8 +16,10 @@ import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.repository.LegalRepository;
+import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.LegalService;
 
+import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
@@ -33,12 +35,14 @@ public class LegalServiceImpl implements LegalService {
     private ModelMapper mapper;
     private final UserServiceImpl userService;
     private LegalRepository legalRepository;
+    private AuditService auditService;
 
     @Autowired
-    public LegalServiceImpl(ModelMapper mapper, LegalRepository legalRepository, UserServiceImpl userService) {
+    public LegalServiceImpl(ModelMapper mapper, LegalRepository legalRepository, UserServiceImpl userService, AuditService auditService) {
         this.mapper = mapper;
         this.legalRepository = legalRepository;
         this.userService = userService;
+        this.auditService = auditService;
     }
 
     @Override
@@ -64,11 +68,13 @@ public class LegalServiceImpl implements LegalService {
     }
 
     @Override
+    @Transactional
     public boolean deleteCustomerByUuid(UUID uuid) {
         return deleteByUuid(uuid, false);
     }
 
     @Override
+    @Transactional
     public boolean deleteSupplierByUuid(UUID uuid) {
         return deleteByUuid(uuid, true);
     }
@@ -93,10 +99,10 @@ public class LegalServiceImpl implements LegalService {
     private UUID saveLegal(Legal legal) {
         validateLegal(legal);
         UserEntity loggedUser = userService.getLoggedUser();
-
+        Legal oldLegal = null;
         //if updating entry, check, if updater is owner
         if (legal.getUuid() != null) {
-            getLegal(legal.getUuid(), userService.getLoggedUser().getUuid(), legal.getClass());
+            oldLegal = getLegal(legal.getUuid(), userService.getLoggedUser().getUuid(), legal.getClass());
         }
         try {
             LegalEntity legalEntity = mapper.map(legal, LegalEntity.class);
@@ -109,8 +115,10 @@ public class LegalServiceImpl implements LegalService {
             UUID uuid = legalRepository.save(legalEntity).getUuid();
             if (legalEntity.isSupplierFlag()) {
                 log.info("Supplier " + legal.getName() + " was created/updated.");
+                auditService.log(Supplier.class, userService.getLoggedUser().getUuid(), oldLegal, legal);
             } else {
                 log.info("Customer " + legal.getName() + " was created/updated.");
+                auditService.log(Customer.class, userService.getLoggedUser().getUuid(), oldLegal, legal);
             }
             return uuid;
         } catch (DataIntegrityViolationException e) {
@@ -144,12 +152,15 @@ public class LegalServiceImpl implements LegalService {
     private boolean deleteByUuid(UUID uuid, boolean supplier) {
         validateUuid(uuid);
         try {
-            String name = getLegal(uuid, userService.getLoggedUser().getUuid(), supplier).getName();
+            Legal legal = getLegal(uuid, userService.getLoggedUser().getUuid(), supplier);
+            String name = legal.getName();
             legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
             if (supplier) {
                 log.info("Supplier " + name + " was deleted.");
+                auditService.log(Supplier.class, userService.getLoggedUser().getUuid(), legal, null);
             } else {
                 log.info("Customer " + name + " was deleted.");
+                auditService.log(Customer.class, userService.getLoggedUser().getUuid(), legal, null);
             }
             return true;
         } catch (EmptyResultDataAccessException e) {

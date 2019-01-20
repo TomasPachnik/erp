@@ -18,6 +18,7 @@ import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.repository.AssetRepository;
 import sk.tomas.erp.repository.InvoiceRepository;
 import sk.tomas.erp.repository.LegalRepository;
+import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.InvoiceService;
 
 import javax.persistence.EntityManager;
@@ -42,16 +43,20 @@ public class InvoiceServiceImpl implements InvoiceService {
     private InvoiceRepository invoiceRepository;
     private final LegalRepository legalRepository;
     private final AssetRepository assetRepository;
+    private AuditService auditService;
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public InvoiceServiceImpl(ModelMapper mapper, InvoiceRepository invoiceRepository, UserServiceImpl userService, LegalRepository legalRepository, AssetRepository assetRepository) {
+    public InvoiceServiceImpl(ModelMapper mapper, InvoiceRepository invoiceRepository,
+                              UserServiceImpl userService, LegalRepository legalRepository,
+                              AssetRepository assetRepository, AuditService auditService) {
         this.mapper = mapper;
         this.invoiceRepository = invoiceRepository;
         this.userService = userService;
         this.legalRepository = legalRepository;
         this.assetRepository = assetRepository;
+        this.auditService = auditService;
     }
 
     @Override
@@ -83,9 +88,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public boolean deleteByUuid(UUID uuid) {
         try {
-            List<AssetEntity> assets = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid()).getAssets();
+            Invoice invoice = getInvoice(uuid, userService.getLoggedUser().getUuid());
+            auditService.log(Invoice.class, userService.getLoggedUser().getUuid(), invoice, null);
+            InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
+            List<AssetEntity> assets = invoiceEntity.getAssets();
             List<UUID> uuids = entitiesToUuids(assets);
             String name = get(uuid).getName();
             invoiceRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid());
@@ -104,9 +113,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     public UUID save(InvoiceInput invoiceInput) {
         validateInvoice(invoiceInput);
         UserEntity loggedUser = userService.getLoggedUser();
+        Invoice oldInvoice = null;
         //if updating entry, check, if updater is owner
         if (invoiceInput.getUuid() != null) {
-            getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
+            oldInvoice = getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
         }
         Invoice invoice = mapper.map(invoiceInput, Invoice.class);
         InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
@@ -116,7 +126,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         try {
             invoiceEntity.setOwner(loggedUser.getUuid());
             InvoiceEntity merge = entityManager.merge(invoiceEntity);
+            Invoice newInvoice = getInvoice(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
             log.info("Invoice " + invoiceInput.getName() + " was created/updated.");
+            auditService.log(InvoiceEntity.class, loggedUser.getUuid(), oldInvoice, newInvoice);
             return merge.getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
