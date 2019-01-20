@@ -82,7 +82,9 @@ public class UserServiceImpl implements UserService {
                 userEntity.setRoles(Collections.singletonList("ROLE_USER"));
             }
 
-            return usersRepository.save(userEntity).getUuid();
+            UUID uuid = usersRepository.save(userEntity).getUuid();
+            log.info("User " + user.getLogin() + " was created/updated.");
+            return uuid;
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
             throw new SqlException("Cannot save user");
@@ -101,7 +103,9 @@ public class UserServiceImpl implements UserService {
     public boolean delete(UUID uuid) {
         validateUuid(uuid);
         try {
+            String login = get(uuid).getLogin();
             usersRepository.deleteById(uuid);
+            log.info("User " + login + " was deleted.");
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
@@ -128,8 +132,10 @@ public class UserServiceImpl implements UserService {
         if (passwordEncoder.matches(changePassword.getOldPassword(), loggedUser.getPassword())) {
             loggedUser.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             usersRepository.save(loggedUser);
+            log.info("User " + loggedUser.getLogin() + " successfully changed password.");
             return new Result(true);
         }
+        log.info("User " + loggedUser.getLogin() + " tried to change password, but was not successful.");
         return new Result(false);
     }
 

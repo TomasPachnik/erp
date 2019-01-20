@@ -106,10 +106,24 @@ public class LegalServiceImpl implements LegalService {
                 legalEntity.setSupplierFlag(false);
             }
             legalEntity.setOwner(loggedUser.getUuid());
-            return legalRepository.save(legalEntity).getUuid();
+            UUID uuid = legalRepository.save(legalEntity).getUuid();
+            if (legalEntity.isSupplierFlag()) {
+                log.info("Supplier " + legal.getName() + " was created/updated.");
+            } else {
+                log.info("Customer " + legal.getName() + " was created/updated.");
+            }
+            return uuid;
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
             throw new SqlException("Cannot save " + legal.getClass().getSimpleName());
+        }
+    }
+
+    private Legal getLegal(UUID uuid, UUID owner, boolean supplier) {
+        if (supplier) {
+            return getLegal(uuid, owner, Supplier.class);
+        } else {
+            return getLegal(uuid, owner, Customer.class);
         }
     }
 
@@ -130,7 +144,13 @@ public class LegalServiceImpl implements LegalService {
     private boolean deleteByUuid(UUID uuid, boolean supplier) {
         validateUuid(uuid);
         try {
+            String name = getLegal(uuid, userService.getLoggedUser().getUuid(), supplier).getName();
             legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
+            if (supplier) {
+                log.info("Supplier " + name + " was deleted");
+            } else {
+                log.info("Customer " + name + " was deleted");
+            }
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;

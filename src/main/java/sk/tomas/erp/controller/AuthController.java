@@ -1,5 +1,6 @@
 package sk.tomas.erp.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.ResponseEntity.ok;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -60,6 +62,7 @@ public class AuthController {
             Map<Object, Object> model = new HashMap<>();
             model.put("username", username);
             model.put("token", token);
+            log.info("User " + data.getUsername() + " logged in.");
             return ok(model);
         } catch (BadCredentialsException bce) {
             throw new LoginException("Bad credentials");

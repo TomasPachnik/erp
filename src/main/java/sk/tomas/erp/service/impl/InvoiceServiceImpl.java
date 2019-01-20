@@ -87,10 +87,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         try {
             List<AssetEntity> assets = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid()).getAssets();
             List<UUID> uuids = entitiesToUuids(assets);
+            String name = get(uuid).getName();
             invoiceRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid());
             if (!uuids.isEmpty()) {
                 assetRepository.deleteByUuid(uuids);
             }
+            log.info("Invoice " + name + " was deleted.");
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
@@ -114,6 +116,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         try {
             invoiceEntity.setOwner(loggedUser.getUuid());
             InvoiceEntity merge = entityManager.merge(invoiceEntity);
+            log.info("Invoice " + invoiceInput.getName() + " was created/updated.");
             return merge.getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
