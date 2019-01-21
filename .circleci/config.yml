@@ -15,7 +15,7 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-      - run: mvn clean install -DskipTests
+      - run: mvn clean install
       - run: docker build -f Dockerfile -t $DOCKER_HUB_USER/$DOCKER_HUB_PROJECT:latest .
       - deploy:
           command:  |
