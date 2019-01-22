@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.entity.AuditEntity;
 import sk.tomas.erp.repository.AuditRepository;
 import sk.tomas.erp.service.AuditService;
@@ -14,6 +15,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@MethodCallLogger
 public class AuditServiceImpl implements AuditService {
 
     private AuditRepository auditRepository;

@@ -8,4 +8,8 @@ public class ChangePassword {
     private String oldPassword;
     private String newPassword;
 
+    @Override
+    public String toString() {
+        return "ChangePassword{}";
+    }
 }

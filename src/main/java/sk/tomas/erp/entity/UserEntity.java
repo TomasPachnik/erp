@@ -72,4 +72,16 @@ public class UserEntity extends BaseEntity implements UserDetails {
         return enabled;
     }
 
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "login='" + login + '\'' +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", enabled=" + enabled +
+                ", roles=" + roles +
+                ", uuid=" + uuid +
+                '}';
+    }
 }

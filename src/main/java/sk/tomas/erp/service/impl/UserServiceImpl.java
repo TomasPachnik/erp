@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.bo.ChangePassword;
 import sk.tomas.erp.bo.ChangeUser;
 import sk.tomas.erp.bo.Result;
@@ -40,6 +41,7 @@ import static sk.tomas.erp.validator.UserServiceValidator.*;
 
 @Slf4j
 @Service
+@MethodCallLogger
 public class UserServiceImpl implements UserService {
 
     private ModelMapper mapper;

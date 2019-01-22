@@ -8,6 +8,7 @@ import org.iban4j.Iban;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.exception.PdfGenerateException;
 import sk.tomas.erp.service.PdfService;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@MethodCallLogger
 public class PdfServiceImpl implements PdfService {
 
 

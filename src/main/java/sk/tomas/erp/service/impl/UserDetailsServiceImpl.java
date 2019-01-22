@@ -5,9 +5,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.repository.UserRepository;
 
 @Service
+@MethodCallLogger
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private UserRepository users;
