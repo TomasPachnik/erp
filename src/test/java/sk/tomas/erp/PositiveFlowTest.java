@@ -56,7 +56,7 @@ public class PositiveFlowTest {
         user.setPhone("phone number");
         ChangeUser changeUser = new ChangeUser();
         changeUser.setEmail("new@new");
-        changeUser.setName("new");
+        changeUser.setName("User user");
         changeUser.setPhone("new_phone");
         userService.saveCurrent(changeUser);
         User changed = userService.getByToken();

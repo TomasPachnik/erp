@@ -26,9 +26,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
 
+import static sk.tomas.erp.util.Utils.createdUpdated;
 import static sk.tomas.erp.util.Utils.entitiesToUuids;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 import static sk.tomas.erp.validator.InvoiceServiceValidator.validateInvoice;
@@ -103,7 +105,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 if (!uuids.isEmpty()) {
                     assetRepository.deleteByUuid(uuids);
                 }
-                log.info("Invoice " + name + " was deleted.");
+                log.info(MessageFormat.format("Invoice ''{0}'' was deleted by ''{1}''.", name, userService.getLoggedUser().getLogin()));
                 return true;
             }
             return false;
@@ -131,13 +133,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         try {
             invoiceEntity.setOwner(loggedUser.getUuid());
             InvoiceEntity merge = entityManager.merge(invoiceEntity);
-            log.info("Invoice " + invoiceInput.getName() + " was created/updated.");
             InvoiceEntity newInvoice = (InvoiceEntity) SerializationUtils.clone(invoiceRepository.getOne(merge.getUuid()));
+            log.info(MessageFormat.format("Invoice ''{0}'' was {1} by ''{2}''.",
+                    invoiceInput.getName(), createdUpdated(oldInvoice), userService.getLoggedUser().getLogin()));
             auditService.log(InvoiceEntity.class, loggedUser.getUuid(), oldInvoice, newInvoice);
             return merge.getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
-            throw new SqlException("Cannot save " + invoiceInput.getClass().getSimpleName());
+            throw new SqlException(MessageFormat.format("Cannot save {0}", invoiceInput.getClass().getSimpleName()));
         }
     }
 

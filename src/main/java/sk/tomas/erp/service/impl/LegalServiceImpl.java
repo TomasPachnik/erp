@@ -22,9 +22,11 @@ import sk.tomas.erp.service.LegalService;
 
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
 
+import static sk.tomas.erp.util.Utils.createdUpdated;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 import static sk.tomas.erp.validator.LegalServiceValidator.*;
 
@@ -119,11 +121,11 @@ public class LegalServiceImpl implements LegalService {
             UUID uuid = legalRepository.save(legalEntity).getUuid();
             LegalEntity newLegal = (LegalEntity) SerializationUtils.clone(legalRepository.getOne(uuid));
             auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), oldLegal, newLegal);
-            if (legalEntity.isSupplierFlag()) {
-                log.info("Supplier " + legal.getName() + " was created/updated.");
-            } else {
-                log.info("Customer " + legal.getName() + " was created/updated.");
-            }
+
+            String legalType = legalEntity.isSupplierFlag() ? "Supplier" : "Customer";
+            log.info(MessageFormat.format("{0} ''{1}'' was {2} by ''{3}''.",
+                    legalType, legal.getName(), createdUpdated(oldLegal), userService.getLoggedUser().getLogin()));
+
             return uuid;
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
@@ -161,11 +163,9 @@ public class LegalServiceImpl implements LegalService {
                 String name = legalEntity.getName();
                 auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntity, null);
                 legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
-                if (supplier) {
-                    log.info("Supplier " + name + " was deleted.");
-                } else {
-                    log.info("Customer " + name + " was deleted.");
-                }
+                String legalType = supplier ? "Supplier" : "Customer";
+                log.info(MessageFormat.format("{0} ''{1}'' was deleted by ''{2}''.",
+                        legalType, name, userService.getLoggedUser().getLogin()));
                 return true;
             }
             return false;

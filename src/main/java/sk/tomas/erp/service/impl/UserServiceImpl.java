@@ -28,11 +28,13 @@ import sk.tomas.erp.validator.UserServiceValidator;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static sk.tomas.erp.util.Utils.createdUpdated;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 import static sk.tomas.erp.validator.UserServiceValidator.*;
 
@@ -94,7 +96,7 @@ public class UserServiceImpl implements UserService {
 
             UUID uuid = usersRepository.save(userEntity).getUuid();
             auditService.log(UserEntity.class, getLoggedUser().getUuid(), oldUser, usersRepository.getOne(uuid));
-            log.info("User " + user.getLogin() + " was created/updated.");
+            log.info(MessageFormat.format("User ''{0}'' was {1} by ''{2}''.", user.getLogin(), createdUpdated(oldUser), getByToken().getLogin()));
             return uuid;
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
@@ -119,7 +121,7 @@ public class UserServiceImpl implements UserService {
             String login = user.getLogin();
             auditService.log(UserEntity.class, getLoggedUser().getUuid(), user, null);
             usersRepository.deleteById(uuid);
-            log.info("User " + login + " was deleted.");
+            log.info(MessageFormat.format("User ''{0}'' was deleted by ''{1}''.", login, getLoggedUser().getLogin()));
             return true;
         } catch (EmptyResultDataAccessException | EntityNotFoundException | ResourceNotFoundException e) {
             return false;
@@ -147,11 +149,11 @@ public class UserServiceImpl implements UserService {
         if (passwordEncoder.matches(changePassword.getOldPassword(), loggedUser.getPassword())) {
             loggedUser.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             usersRepository.save(loggedUser);
-            log.info("User " + loggedUser.getLogin() + " successfully changed password.");
+            log.info(MessageFormat.format("User ''{0}'' successfully changed password.", loggedUser.getLogin()));
             auditService.log(UserEntity.class, loggedUser.getUuid(), loggedUser, usersRepository.getOne(loggedUser.getUuid()));
             return new Result(true);
         }
-        log.info("User " + loggedUser.getLogin() + " tried to change password, but was not successful.");
+        log.info(MessageFormat.format("User ''{0}'' tried to change password, but was not successful.", loggedUser.getLogin()));
         return new Result(false);
     }
 

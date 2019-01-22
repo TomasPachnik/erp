@@ -17,4 +17,11 @@ public class Utils {
         return uuids;
     }
 
+    public static String createdUpdated(Object o) {
+        if (o == null) {
+            return "created";
+        }
+        return "updated";
+    }
+
 }
