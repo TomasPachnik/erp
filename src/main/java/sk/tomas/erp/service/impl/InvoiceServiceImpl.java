@@ -91,18 +91,22 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional
     public boolean deleteByUuid(UUID uuid) {
+        validateUuid(uuid);
         try {
             InvoiceEntity invoiceEntity = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid());
-            auditService.log(InvoiceEntity.class, userService.getLoggedUser().getUuid(), invoiceEntity, null);
-            List<AssetEntity> assets = invoiceEntity.getAssets();
-            List<UUID> uuids = entitiesToUuids(assets);
-            String name = get(uuid).getName();
-            invoiceRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid());
-            if (!uuids.isEmpty()) {
-                assetRepository.deleteByUuid(uuids);
+            if (invoiceEntity != null) {
+                auditService.log(InvoiceEntity.class, userService.getLoggedUser().getUuid(), invoiceEntity, null);
+                List<AssetEntity> assets = invoiceEntity.getAssets();
+                List<UUID> uuids = entitiesToUuids(assets);
+                String name = get(uuid).getName();
+                invoiceRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid());
+                if (!uuids.isEmpty()) {
+                    assetRepository.deleteByUuid(uuids);
+                }
+                log.info("Invoice " + name + " was deleted.");
+                return true;
             }
-            log.info("Invoice " + name + " was deleted.");
-            return true;
+            return false;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }

@@ -157,15 +157,18 @@ public class LegalServiceImpl implements LegalService {
         validateUuid(uuid);
         try {
             LegalEntity legalEntity = legalRepository.findByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
-            String name = legalEntity.getName();
-            auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntity, null);
-            legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
-            if (supplier) {
-                log.info("Supplier " + name + " was deleted.");
-            } else {
-                log.info("Customer " + name + " was deleted.");
+            if (legalEntity != null) {
+                String name = legalEntity.getName();
+                auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntity, null);
+                legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
+                if (supplier) {
+                    log.info("Supplier " + name + " was deleted.");
+                } else {
+                    log.info("Customer " + name + " was deleted.");
+                }
+                return true;
             }
-            return true;
+            return false;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }

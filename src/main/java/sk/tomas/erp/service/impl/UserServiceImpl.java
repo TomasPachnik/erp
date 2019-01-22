@@ -25,6 +25,7 @@ import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.UserService;
 import sk.tomas.erp.validator.UserServiceValidator;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -120,7 +121,7 @@ public class UserServiceImpl implements UserService {
             usersRepository.deleteById(uuid);
             log.info("User " + login + " was deleted.");
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | EntityNotFoundException e) {
             return false;
         }
     }
