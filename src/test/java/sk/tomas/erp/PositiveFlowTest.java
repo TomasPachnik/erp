@@ -49,7 +49,6 @@ public class PositiveFlowTest {
         deleteSupplier(supplier);
         deleteCustomer(customer);
         deleteUserByAdmin(user);
-
     }
 
     private void updateUser() {
@@ -156,7 +155,6 @@ public class PositiveFlowTest {
         invoiceInput.setDateOfIssue(new Date(invoiceInput.getDateOfIssue().getTime()));
         invoiceInput.setDeliveryDate(new Date(invoiceInput.getDeliveryDate().getTime()));
         invoiceInput.setDueDate(new Date(invoiceInput.getDueDate().getTime()));
-
         Assert.assertEquals(invoice, invoiceInput);
         return uuid;
     }

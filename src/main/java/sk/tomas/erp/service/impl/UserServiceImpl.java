@@ -115,13 +115,13 @@ public class UserServiceImpl implements UserService {
     public boolean delete(UUID uuid) {
         validateUuid(uuid);
         try {
-            UserEntity user = usersRepository.getOne(uuid);
+            User user = get(uuid);
             String login = user.getLogin();
             auditService.log(UserEntity.class, getLoggedUser().getUuid(), user, null);
             usersRepository.deleteById(uuid);
             log.info("User " + login + " was deleted.");
             return true;
-        } catch (EmptyResultDataAccessException | EntityNotFoundException e) {
+        } catch (EmptyResultDataAccessException | EntityNotFoundException | ResourceNotFoundException e) {
             return false;
         }
     }
@@ -140,6 +140,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Result changePassword(ChangePassword changePassword) {
         validatePassword(changePassword);
         UserEntity loggedUser = getLoggedUser();
