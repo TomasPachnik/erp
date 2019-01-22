@@ -16,25 +16,25 @@ import java.util.Optional;
 @Slf4j
 public class DataInitializer implements CommandLineRunner {
 
-    private UserRepository users;
+    private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
 
     @Value("${admin.default.password:password}")
     private String password;
 
     @Autowired
-    public DataInitializer(PasswordEncoder passwordEncoder, UserRepository users) {
+    public DataInitializer(PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
-        this.users = users;
+        this.userRepository = userRepository;
     }
 
     @Override
     public void run(String... args) {
 
-        Optional<UserEntity> admin = users.findByLogin("admin");
+        Optional<UserEntity> admin = userRepository.findByLogin("admin");
 
         if (!admin.isPresent()) {
-            this.users.save(UserEntity.builder()
+            this.userRepository.save(UserEntity.builder()
                     .login("admin")
                     .name("admin")
                     .email("admin@admin")
