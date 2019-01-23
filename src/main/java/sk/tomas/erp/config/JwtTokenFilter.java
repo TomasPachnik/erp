@@ -36,7 +36,6 @@ public class JwtTokenFilter extends GenericFilterBean {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
             filterChain.doFilter(req, res);
-
         } catch (TokenException e) {
             ServerMessage serverMessage = new ServerMessage(e.getClass().getSimpleName(), e.getMessage());
 
