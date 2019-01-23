@@ -20,6 +20,7 @@ import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.LoginException;
 import sk.tomas.erp.repository.UserRepository;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -62,13 +63,13 @@ public class AuthController {
             Map<Object, Object> model = new HashMap<>();
             model.put("username", username);
             model.put("token", token);
-            log.info("User " + data.getUsername() + " logged in.");
+            log.info(MessageFormat.format("User ''{0}'' logged in.", data.getUsername()));
             return ok(model);
         } catch (BadCredentialsException bce) {
-            log.info("User " + data.getUsername() + " inserted bad credentials.");
+            log.info(MessageFormat.format("User ''{0}'' inserted bad credentials.", data.getUsername()));
             throw new LoginException("Bad credentials");
         } catch (DisabledException e) {
-            log.info("User " + data.getUsername() + " tried logged in, but is not active.");
+            log.info(MessageFormat.format("User ''{0}'' tried logged in, but is not active.", data.getUsername()));
             throw new LoginException("User not active");
         }
     }
@@ -90,7 +91,7 @@ public class AuthController {
         Optional<UserEntity> byLogin = userRepository.findByLogin(data.getUsername());
         if (byLogin.isPresent()) {
             if (!passwordEncoder.matches(data.getPassword(), byLogin.get().getPassword())) {
-                log.info("User " + data.getUsername() + " inserted bad credentials.");
+                log.info(MessageFormat.format("User ''{0}'' inserted bad credentials.", data.getUsername()));
                 throw new LoginException("Bad credentials");
             }
             return byLogin.get();

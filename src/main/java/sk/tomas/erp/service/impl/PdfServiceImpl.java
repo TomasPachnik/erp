@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class PdfServiceImpl implements PdfService {
     public byte[] generatePdf(Invoice invoice) {
         try {
             byte[] bytes = Files.readAllBytes(privateGeneratePdf(invoice, invoice.getInvoiceNumber()).toPath());
-            log.info("PDF for invoice " + invoice.getName() + " generated.");
+            log.info(MessageFormat.format("PDF for invoice ''{0}'' generated.", invoice.getName()));
             return bytes;
         } catch (JRException | IOException e) {
             log.error(e.getMessage());
