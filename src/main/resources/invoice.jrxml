@@ -424,7 +424,7 @@
 				</graphicElement>
 			</line>
 			<textField>
-				<reportElement x="231" y="80" width="100" height="14" uuid="9b5d06a7-12e2-47ff-ac6e-b8a2f455978e"/>
+				<reportElement x="183" y="80" width="196" height="14" uuid="9b5d06a7-12e2-47ff-ac6e-b8a2f455978e"/>
 				<textElement textAlignment="Center">
 					<font size="8"/>
 				</textElement>
