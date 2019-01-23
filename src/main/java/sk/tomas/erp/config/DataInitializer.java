@@ -30,9 +30,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-
         Optional<UserEntity> admin = userRepository.findByLogin("admin");
-
         if (!admin.isPresent()) {
             this.userRepository.save(UserEntity.builder()
                     .login("admin")
