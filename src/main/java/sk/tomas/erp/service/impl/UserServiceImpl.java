@@ -88,7 +88,6 @@ public class UserServiceImpl implements UserService {
                 } else {
                     throw new ResourceNotFoundException("User can not be updated!");
                 }
-
                 byId.ifPresent(userEntity1 -> userEntity.setPassword(userEntity1.getPassword()));
                 byId.ifPresent(userEntity1 -> userEntity.setRoles(userEntity1.getRoles()));
             } else {
