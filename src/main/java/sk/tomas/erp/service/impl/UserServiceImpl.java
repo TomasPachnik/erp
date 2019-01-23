@@ -73,7 +73,6 @@ public class UserServiceImpl implements UserService {
         UserEntity oldUser = null;
         try {
             UserEntity userEntity = mapper.map(user, UserEntity.class);
-
             if (user.getUuid() != null) {
                 Optional<UserEntity> byId = usersRepository.findById(user.getUuid());
                 if (byId.isPresent()) {
