@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.bo.*;
@@ -79,11 +81,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     public Paging all(PagingInput input) {
         validatePagingInput(input);
         Page<InvoiceEntity> page = invoiceRepository.findByOwner(userService.getLoggedUser().getUuid(),
-                new InvoicesPageable(input.getPageIndex(), input.getPageSize()));
+                PageRequest.of(input.getPageIndex(), input.getPageSize(), new Sort(Sort.Direction.ASC, "dueDate")));
 
         Paging paging = new Paging();
         paging.setTotal((int) page.getTotalElements());
-        paging.setPageable(new PagingInput((int) page.getPageable().getOffset(), page.getPageable().getPageSize()));
+
+        paging.setPageable(new PagingInput(u page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
         Type listType = new TypeToken<List<Invoice>>() {
         }.getType();
         paging.setContent(mapper.map(page.getContent(), listType));
