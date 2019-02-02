@@ -86,7 +86,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Paging paging = new Paging();
         paging.setTotal((int) page.getTotalElements());
 
-        paging.setPageable(new PagingInput(u page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
+        paging.setPageable(new PagingInput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
         Type listType = new TypeToken<List<Invoice>>() {
         }.getType();
         paging.setContent(mapper.map(page.getContent(), listType));
