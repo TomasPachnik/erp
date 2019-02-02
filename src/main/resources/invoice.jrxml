@@ -196,23 +196,23 @@
 				<textFieldExpression><![CDATA[$P{supplierVariableSymbol}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="300" y="230" width="80" height="16" uuid="389add6b-0396-4fd5-9812-c8a40587a630"/>
+				<reportElement x="300" y="230" width="90" height="16" uuid="389add6b-0396-4fd5-9812-c8a40587a630"/>
 				<textFieldExpression><![CDATA[$P{customer.companyIdentificationNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="300" y="242" width="80" height="16" uuid="13c54898-09c8-4f4a-8de8-6679cbe5a11b"/>
+				<reportElement x="300" y="242" width="90" height="16" uuid="13c54898-09c8-4f4a-8de8-6679cbe5a11b"/>
 				<textFieldExpression><![CDATA[$P{customer.taxIdentificationNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="390" y="226" width="110" height="16" uuid="85560dba-eb7e-428e-81a4-ae747496738f"/>
+				<reportElement x="400" y="226" width="110" height="16" uuid="85560dba-eb7e-428e-81a4-ae747496738f"/>
 				<textFieldExpression><![CDATA[$P{dateOfIssue}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="390" y="238" width="110" height="16" uuid="0af71d3b-8ab4-4224-86e4-fc30e8c85bcc"/>
+				<reportElement x="400" y="238" width="110" height="16" uuid="0af71d3b-8ab4-4224-86e4-fc30e8c85bcc"/>
 				<textFieldExpression><![CDATA[$P{deliveryDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="390" y="250" width="110" height="16" uuid="cea07cef-e037-4eda-b6e6-9d2acfda6931"/>
+				<reportElement x="400" y="250" width="110" height="16" uuid="cea07cef-e037-4eda-b6e6-9d2acfda6931"/>
 				<textFieldExpression><![CDATA[$P{dueDate}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yyyy">
