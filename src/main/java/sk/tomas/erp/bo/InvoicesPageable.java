@@ -29,7 +29,7 @@ public class InvoicesPageable implements Pageable {
 
     @Override
     public Sort getSort() {
-        return new Sort(Sort.Direction.ASC, "invoiceNumber");
+        return new Sort(Sort.Direction.ASC, "dueDate");
     }
 
     @Override
