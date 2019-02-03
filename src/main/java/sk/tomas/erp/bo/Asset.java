@@ -1,6 +1,5 @@
 package sk.tomas.erp.bo;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -12,10 +11,5 @@ public class Asset extends Base {
     private BigDecimal count;
     private String unit;
     private BigDecimal unitPrice;
-
-    @JsonGetter("total")
-    public BigDecimal getTotal() {
-        return count.multiply(unitPrice);
-    }
 
 }

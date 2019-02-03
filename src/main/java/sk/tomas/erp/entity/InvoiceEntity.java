@@ -3,8 +3,11 @@ package sk.tomas.erp.entity;
 import lombok.Data;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -30,9 +33,11 @@ public class InvoiceEntity extends OwnerEntity {
     private Date dateOfIssue;
     private Date deliveryDate;
     private Date dueDate;
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn
     private List<AssetEntity> assets;
+    private BigDecimal total;
     private String note;
 
 }

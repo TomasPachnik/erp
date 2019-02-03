@@ -25,11 +25,11 @@ import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.util.Utils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -51,8 +51,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final LegalRepository legalRepository;
     private final AssetRepository assetRepository;
     private AuditService auditService;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     private final List<String> tableProperties;
 
@@ -71,6 +69,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public Invoice get(UUID uuid) {
         return getInvoice(uuid, userService.getLoggedUser().getUuid());
     }
@@ -106,14 +105,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         try {
             InvoiceEntity invoiceEntity = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid());
             if (invoiceEntity != null) {
+                String name = invoiceEntity.getName();
+                invoiceRepository.delete(invoiceEntity);
                 auditService.log(InvoiceEntity.class, userService.getLoggedUser().getUuid(), invoiceEntity, null);
-                List<AssetEntity> assets = invoiceEntity.getAssets();
-                List<UUID> uuids = entitiesToUuids(assets);
-                String name = get(uuid).getName();
-                invoiceRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid());
-                if (!uuids.isEmpty()) {
-                    assetRepository.deleteByUuid(uuids);
-                }
                 log.info(MessageFormat.format("Invoice ''{0}'' was deleted by ''{1}''.", name, userService.getLoggedUser().getLogin()));
                 return true;
             }
@@ -131,8 +125,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         InvoiceEntity oldInvoice = null;
         //if updating entry, check, if updater is owner
         if (invoiceInput.getUuid() != null) {
-            oldInvoice = (InvoiceEntity) SerializationUtils.clone(
-                    invoiceRepository.findByUuid(invoiceInput.getUuid(), userService.getLoggedUser().getUuid()));
+            InvoiceEntity byUuid = invoiceRepository.findByUuid(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
+            //clone is not working very well with hibernate lazy loading
+            oldInvoice = (InvoiceEntity) SerializationUtils.clone(byUuid);
         }
         Invoice invoice = mapper.map(invoiceInput, Invoice.class);
         InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
@@ -141,16 +136,35 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceEntity.setUser(userService.getLoggedUser());
         try {
             invoiceEntity.setOwner(loggedUser.getUuid());
-            InvoiceEntity merge = entityManager.merge(invoiceEntity);
-            InvoiceEntity newInvoice = (InvoiceEntity) SerializationUtils.clone(invoiceRepository.getOne(merge.getUuid()));
+            invoiceEntity.setTotal(calculateTotal(invoiceEntity));
+            InvoiceEntity save = invoiceRepository.save(invoiceEntity);
+            InvoiceEntity newOne = invoiceRepository.getOne(save.getUuid());
             log.info(MessageFormat.format("Invoice ''{0}'' was {1} by ''{2}''.",
                     invoiceInput.getName(), createdUpdated(oldInvoice), userService.getLoggedUser().getLogin()));
-            auditService.log(InvoiceEntity.class, loggedUser.getUuid(), oldInvoice, newInvoice);
-            return merge.getUuid();
+
+            //TODO fix audit
+            //auditService.log(InvoiceEntity.class, loggedUser.getUuid(), oldInvoice, newInvoice);
+            return save.getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
             throw new SqlException(MessageFormat.format("Cannot save {0}", invoiceInput.getClass().getSimpleName()));
         }
+    }
+
+    private List<AssetEntity> clone(List<AssetEntity> input) {
+        List<AssetEntity> result = new ArrayList<>();
+        for (AssetEntity assetEntity : input) {
+            result.add((AssetEntity) SerializationUtils.clone(assetEntity));
+        }
+        return result;
+    }
+
+    private BigDecimal calculateTotal(InvoiceEntity invoiceEntity) {
+        BigDecimal result = BigDecimal.ZERO;
+        for (AssetEntity asset : invoiceEntity.getAssets()) {
+            result = result.add(asset.getCount().multiply(asset.getUnitPrice()));
+        }
+        return result;
     }
 
     private Invoice getInvoice(UUID uuid, UUID owner) {
