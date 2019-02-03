@@ -1,6 +1,7 @@
 package sk.tomas.erp.util;
 
 
+import org.springframework.data.domain.Sort;
 import sk.tomas.erp.entity.BaseEntity;
 
 import java.util.ArrayList;
@@ -22,6 +23,13 @@ public class Utils {
             return "created";
         }
         return "updated";
+    }
+
+    public static Sort.Direction getSortDirection(String sortDirection) {
+        if ("desc".equals(sortDirection)) {
+            return Sort.Direction.DESC;
+        }
+        return Sort.Direction.ASC;
     }
 
 }

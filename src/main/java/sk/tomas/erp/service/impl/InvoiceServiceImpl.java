@@ -23,12 +23,14 @@ import sk.tomas.erp.repository.InvoiceRepository;
 import sk.tomas.erp.repository.LegalRepository;
 import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.InvoiceService;
+import sk.tomas.erp.util.Utils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.text.MessageFormat;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,6 +54,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private final List<String> tableProperties;
+
     @Autowired
     public InvoiceServiceImpl(ModelMapper mapper, InvoiceRepository invoiceRepository,
                               UserServiceImpl userService, LegalRepository legalRepository,
@@ -62,6 +66,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.legalRepository = legalRepository;
         this.assetRepository = assetRepository;
         this.auditService = auditService;
+        tableProperties = new LinkedList<>();
+        fillTableProperties();
     }
 
     @Override
@@ -81,12 +87,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     public Paging all(PagingInput input) {
         validatePagingInput(input);
         Page<InvoiceEntity> page = invoiceRepository.findByOwner(userService.getLoggedUser().getUuid(),
-                PageRequest.of(input.getPageIndex(), input.getPageSize(), new Sort(Sort.Direction.ASC, "dueDate")));
+                PageRequest.of(input.getPageIndex(), input.getPageSize(), getSortFromInput(input)));
 
         Paging paging = new Paging();
         paging.setTotal((int) page.getTotalElements());
 
-        paging.setPageable(new PagingInput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
+        paging.setPageable(new PagingOutput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
         Type listType = new TypeToken<List<Invoice>>() {
         }.getType();
         paging.setContent(mapper.map(page.getContent(), listType));
@@ -156,4 +162,20 @@ public class InvoiceServiceImpl implements InvoiceService {
         throw new ResourceNotFoundException(Invoice.class.getSimpleName() + " not found with id " + uuid);
     }
 
+    private Sort getSortFromInput(PagingInput input) {
+        String sort = "dueDate";
+        if (tableProperties.contains(input.getSort())) {
+            sort = input.getSort();
+        }
+        return new Sort(Utils.getSortDirection(input.getSortDirection()), sort);
+    }
+
+    private void fillTableProperties() {
+        tableProperties.add("name");
+        tableProperties.add("customer");
+        tableProperties.add("supplier");
+        tableProperties.add("dueDate");
+        tableProperties.add("dateOfIssue");
+        tableProperties.add("deliveryDate");
+    }
 }

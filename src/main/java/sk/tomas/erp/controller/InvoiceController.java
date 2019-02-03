@@ -14,7 +14,6 @@ import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.PdfService;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -34,11 +33,6 @@ public class InvoiceController {
     @GetMapping("/get/{uuid}")
     public Invoice get(@PathVariable UUID uuid) {
         return invoiceService.get(uuid);
-    }
-
-    @GetMapping("/")
-    public List<Invoice> all() {
-        return invoiceService.all();
     }
 
     @PostMapping(path = "/all")

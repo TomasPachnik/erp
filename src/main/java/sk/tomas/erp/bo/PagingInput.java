@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PagingInput {
 
+    private String filter;
+    private String sort;
+    private String sortDirection;
     private int pageIndex;
     private int pageSize;
 

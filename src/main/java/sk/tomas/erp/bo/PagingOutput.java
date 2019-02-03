@@ -4,15 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Paging {
+public class PagingOutput {
 
-    private int total;
-    private List<? extends Base> content;
-    private PagingOutput pageable;
-
+    private int pageIndex;
+    private int pageSize;
+    
 }
