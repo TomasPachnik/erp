@@ -161,8 +161,8 @@ public class LegalServiceImpl implements LegalService {
             LegalEntity legalEntity = legalRepository.findByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
             if (legalEntity != null) {
                 String name = legalEntity.getName();
-                auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntity, null);
-                legalRepository.deleteByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
+                //auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntity, null);
+                legalRepository.delete(legalEntity);
                 String legalType = supplier ? "Supplier" : "Customer";
                 log.info(MessageFormat.format("{0} ''{1}'' was deleted by ''{2}''.",
                         legalType, name, userService.getLoggedUser().getLogin()));
