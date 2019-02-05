@@ -20,13 +20,13 @@ public class InvoiceEntity extends OwnerEntity {
     private String name;
     private String invoiceNumber;
     private String currency;
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn
     private UserEntity user;
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn
     private LegalEntity supplier;
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn
     private LegalEntity customer;
     private String supplierVariableSymbol;
@@ -34,7 +34,6 @@ public class InvoiceEntity extends OwnerEntity {
     private Date deliveryDate;
     private Date dueDate;
     @OneToMany(cascade = CascadeType.ALL)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn
     private List<AssetEntity> assets;
     private BigDecimal total;
