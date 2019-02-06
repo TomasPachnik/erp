@@ -9,10 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import sk.tomas.erp.bo.*;
-import sk.tomas.erp.service.DateService;
-import sk.tomas.erp.service.InvoiceService;
-import sk.tomas.erp.service.LegalService;
-import sk.tomas.erp.service.UserService;
+import sk.tomas.erp.service.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -33,6 +30,8 @@ public class PositiveFlowTest {
     @Autowired
     private InvoiceService invoiceService;
     @Autowired
+    private PdfService pdfService;
+    @Autowired
     private ModelMapper mapper;
 
     @Test
@@ -47,6 +46,7 @@ public class PositiveFlowTest {
         UUID customer = createCustomer();
         updateCustomer(customer);
         UUID invoice = createInvoice(supplier, customer);
+        pdfService.generatePdf(invoiceService.get(invoice));
         updateInvoice(invoice);
         deleteInvoice(invoice);
         deleteSupplier(supplier);
