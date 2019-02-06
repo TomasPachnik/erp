@@ -1,6 +1,11 @@
 package sk.tomas.erp.util;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import sk.tomas.erp.entity.BaseEntity;
 
@@ -9,6 +14,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class Utils {
+
+    private static ObjectMapper mapper;
+    private static Logger log = LoggerFactory.getLogger(Utils.class);
 
     public static List<UUID> entitiesToUuids(List<? extends BaseEntity> entities) {
         List<UUID> uuids = new ArrayList<>();
@@ -30,6 +38,21 @@ public class Utils {
             return Sort.Direction.DESC;
         }
         return Sort.Direction.ASC;
+    }
+
+    public static String convert(Object object, Class clazz) {
+        if (mapper == null) {
+            mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        }
+        if (object != null) {
+            try {
+                return mapper.writeValueAsString(object);
+            } catch (JsonProcessingException e) {
+                log.warn("Cant convert object " + clazz.getName() + " to JSON", e);
+            }
+        }
+        return null;
     }
 
 }

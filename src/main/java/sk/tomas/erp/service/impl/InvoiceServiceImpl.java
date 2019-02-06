@@ -1,7 +1,6 @@
 package sk.tomas.erp.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.SerializationUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +28,11 @@ import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.createdUpdated;
-import static sk.tomas.erp.util.Utils.entitiesToUuids;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 import static sk.tomas.erp.validator.InvoiceServiceValidator.validateInvoice;
 import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput;
@@ -106,8 +103,9 @@ public class InvoiceServiceImpl implements InvoiceService {
             InvoiceEntity invoiceEntity = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid());
             if (invoiceEntity != null) {
                 String name = invoiceEntity.getName();
+                String invoiceEntityString = Utils.convert(invoiceEntity, InvoiceEntity.class);
                 invoiceRepository.delete(invoiceEntity);
-                auditService.log(InvoiceEntity.class, userService.getLoggedUser().getUuid(), invoiceEntity, null);
+                auditService.log(InvoiceEntity.class, userService.getLoggedUser().getUuid(), invoiceEntityString, null);
                 log.info(MessageFormat.format("Invoice ''{0}'' was deleted by ''{1}''.", name, userService.getLoggedUser().getLogin()));
                 return true;
             }
@@ -123,11 +121,11 @@ public class InvoiceServiceImpl implements InvoiceService {
         validateInvoice(invoiceInput);
         UserEntity loggedUser = userService.getLoggedUser();
         InvoiceEntity oldInvoice = null;
+        String invoiceEntityOldString = null;
         //if updating entry, check, if updater is owner
         if (invoiceInput.getUuid() != null) {
-            InvoiceEntity byUuid = invoiceRepository.findByUuid(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
-            //clone is not working very well with hibernate lazy loading
-            oldInvoice = (InvoiceEntity) SerializationUtils.clone(byUuid);
+            oldInvoice = invoiceRepository.findByUuid(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
+            invoiceEntityOldString = Utils.convert(oldInvoice, InvoiceEntity.class);
         }
         Invoice invoice = mapper.map(invoiceInput, Invoice.class);
         InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
@@ -139,24 +137,16 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoiceEntity.setTotal(calculateTotal(invoiceEntity));
             InvoiceEntity save = invoiceRepository.save(invoiceEntity);
             InvoiceEntity newOne = invoiceRepository.getOne(save.getUuid());
+            String invoiceEntityNewString = Utils.convert(newOne, InvoiceEntity.class);
             log.info(MessageFormat.format("Invoice ''{0}'' was {1} by ''{2}''.",
                     invoiceInput.getName(), createdUpdated(oldInvoice), userService.getLoggedUser().getLogin()));
 
-            //TODO fix audit
-            //auditService.log(InvoiceEntity.class, loggedUser.getUuid(), oldInvoice, newInvoice);
+            auditService.log(InvoiceEntity.class, loggedUser.getUuid(), invoiceEntityOldString, invoiceEntityNewString);
             return save.getUuid();
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
             throw new SqlException(MessageFormat.format("Cannot save {0}", invoiceInput.getClass().getSimpleName()));
         }
-    }
-
-    private List<AssetEntity> clone(List<AssetEntity> input) {
-        List<AssetEntity> result = new ArrayList<>();
-        for (AssetEntity assetEntity : input) {
-            result.add((AssetEntity) SerializationUtils.clone(assetEntity));
-        }
-        return result;
     }
 
     private BigDecimal calculateTotal(InvoiceEntity invoiceEntity) {

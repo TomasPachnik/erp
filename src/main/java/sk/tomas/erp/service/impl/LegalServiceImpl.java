@@ -1,7 +1,6 @@
 package sk.tomas.erp.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.SerializationUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.repository.LegalRepository;
 import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.LegalService;
+import sk.tomas.erp.util.Utils;
 
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
@@ -28,7 +28,7 @@ import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.createdUpdated;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
-import static sk.tomas.erp.validator.LegalServiceValidator.*;
+import static sk.tomas.erp.validator.LegalServiceValidator.validateLegal;
 
 @Slf4j
 @Service
@@ -105,10 +105,12 @@ public class LegalServiceImpl implements LegalService {
         validateLegal(legal);
         UserEntity loggedUser = userService.getLoggedUser();
         LegalEntity oldLegal = null;
+        String legalEntityOldString = null;
         //if updating entry, check, if updater is owner
         if (legal.getUuid() != null) {
             Legal legal1 = getLegal(legal.getUuid(), userService.getLoggedUser().getUuid(), legal.getClass());
-            oldLegal = (LegalEntity) SerializationUtils.clone(legalRepository.getOne(legal1.getUuid()));
+            oldLegal = legalRepository.getOne(legal1.getUuid());
+            legalEntityOldString = Utils.convert(oldLegal, LegalEntity.class);
         }
         try {
             LegalEntity legalEntity = mapper.map(legal, LegalEntity.class);
@@ -119,8 +121,8 @@ public class LegalServiceImpl implements LegalService {
             }
             legalEntity.setOwner(loggedUser.getUuid());
             UUID uuid = legalRepository.save(legalEntity).getUuid();
-            LegalEntity newLegal = (LegalEntity) SerializationUtils.clone(legalRepository.getOne(uuid));
-            auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), oldLegal, newLegal);
+            String legalEntityNewString = Utils.convert(legalRepository.getOne(uuid), LegalEntity.class);
+            auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntityOldString, legalEntityNewString);
 
             String legalType = legalEntity.isSupplierFlag() ? "Supplier" : "Customer";
             log.info(MessageFormat.format("{0} ''{1}'' was {2} by ''{3}''.",
@@ -161,7 +163,8 @@ public class LegalServiceImpl implements LegalService {
             LegalEntity legalEntity = legalRepository.findByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
             if (legalEntity != null) {
                 String name = legalEntity.getName();
-                //auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntity, null);
+                String legalEntityString = Utils.convert(legalEntity, LegalEntity.class);
+                auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntityString, null);
                 legalRepository.delete(legalEntity);
                 String legalType = supplier ? "Supplier" : "Customer";
                 log.info(MessageFormat.format("{0} ''{1}'' was deleted by ''{2}''.",

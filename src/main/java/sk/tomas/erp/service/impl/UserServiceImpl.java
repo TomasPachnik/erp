@@ -1,7 +1,6 @@
 package sk.tomas.erp.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.SerializationUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import sk.tomas.erp.exception.ValidationException;
 import sk.tomas.erp.repository.UsersRepository;
 import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.UserService;
+import sk.tomas.erp.util.Utils;
 import sk.tomas.erp.validator.UserServiceValidator;
 
 import javax.persistence.EntityNotFoundException;
@@ -71,12 +71,14 @@ public class UserServiceImpl implements UserService {
     public UUID save(User user) {
         validateInput(user);
         UserEntity oldUser = null;
+        String userEntityOldString = null;
         try {
             UserEntity userEntity = mapper.map(user, UserEntity.class);
             if (user.getUuid() != null) {
                 Optional<UserEntity> byId = usersRepository.findById(user.getUuid());
                 if (byId.isPresent()) {
-                    oldUser = (UserEntity) SerializationUtils.clone(byId.get());
+                    oldUser = byId.get();
+                    userEntityOldString = Utils.convert(oldUser, UserEntity.class);
                     if ("admin".equals(byId.get().getLogin()) && !"admin".equals(user.getLogin())) {
                         throw new ValidationException("Admin username can not be changed!");
                     }
@@ -95,7 +97,8 @@ public class UserServiceImpl implements UserService {
             }
 
             UUID uuid = usersRepository.save(userEntity).getUuid();
-            auditService.log(UserEntity.class, getLoggedUser().getUuid(), oldUser, usersRepository.getOne(uuid));
+            String userEntityNewString = Utils.convert(usersRepository.getOne(uuid), UserEntity.class);
+            auditService.log(UserEntity.class, getLoggedUser().getUuid(), userEntityOldString, userEntityNewString);
             log.info(MessageFormat.format("User ''{0}'' was {1} by ''{2}''.", user.getLogin(), createdUpdated(oldUser), getByToken().getLogin()));
             return uuid;
         } catch (DataIntegrityViolationException e) {
@@ -118,8 +121,9 @@ public class UserServiceImpl implements UserService {
         validateUuid(uuid);
         try {
             User user = get(uuid);
+            String userEntityString = Utils.convert(user, UserEntity.class);
             String login = user.getLogin();
-            auditService.log(UserEntity.class, getLoggedUser().getUuid(), user, null);
+            auditService.log(UserEntity.class, getLoggedUser().getUuid(), userEntityString, null);
             usersRepository.deleteById(uuid);
             log.info(MessageFormat.format("User ''{0}'' was deleted by ''{1}''.", login, getLoggedUser().getLogin()));
             return true;
@@ -146,11 +150,13 @@ public class UserServiceImpl implements UserService {
     public Result changePassword(ChangePassword changePassword) {
         validatePassword(changePassword);
         UserEntity loggedUser = getLoggedUser();
+        String loggedUserOldString = Utils.convert(loggedUser, UserEntity.class);
         if (passwordEncoder.matches(changePassword.getOldPassword(), loggedUser.getPassword())) {
             loggedUser.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             usersRepository.save(loggedUser);
             log.info(MessageFormat.format("User ''{0}'' successfully changed password.", loggedUser.getLogin()));
-            auditService.log(UserEntity.class, loggedUser.getUuid(), loggedUser, usersRepository.getOne(loggedUser.getUuid()));
+            String loggedUserNewString = Utils.convert(usersRepository.getOne(loggedUser.getUuid()), UserEntity.class);
+            auditService.log(UserEntity.class, loggedUser.getUuid(), loggedUserOldString, loggedUserNewString);
             return new Result(true);
         }
         log.info(MessageFormat.format("User ''{0}'' tried to change password, but was not successful.", loggedUser.getLogin()));

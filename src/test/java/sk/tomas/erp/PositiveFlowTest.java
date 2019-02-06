@@ -15,7 +15,10 @@ import sk.tomas.erp.service.LegalService;
 import sk.tomas.erp.service.UserService;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
