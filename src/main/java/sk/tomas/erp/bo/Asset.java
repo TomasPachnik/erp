@@ -12,4 +12,8 @@ public class Asset extends Base {
     private String unit;
     private BigDecimal unitPrice;
 
+    public BigDecimal getTotal(){
+        return unitPrice.multiply(count);
+    }
+
 }
