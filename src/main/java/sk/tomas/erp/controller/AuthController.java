@@ -58,7 +58,7 @@ public class AuthController {
         try {
             String username = data.getUsername();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
-            String token = jwtTokenProvider.createToken(userEntity, this.userRepository.findByLogin(username).orElseThrow(() -> new UsernameNotFoundException("Username " + username + "not found")).getRoles());
+            String token = jwtTokenProvider.createToken(userEntity, this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username " + username + "not found")).getRoles());
 
             Map<Object, Object> model = new HashMap<>();
             model.put("username", username);
@@ -88,7 +88,7 @@ public class AuthController {
     }
 
     private UserEntity checkLogin(AuthenticationRequest data) {
-        Optional<UserEntity> byLogin = userRepository.findByLogin(data.getUsername());
+        Optional<UserEntity> byLogin = userRepository.findByUsername(data.getUsername());
         if (byLogin.isPresent()) {
             if (!passwordEncoder.matches(data.getPassword(), byLogin.get().getPassword())) {
                 log.info(MessageFormat.format("User ''{0}'' inserted bad credentials.", data.getUsername()));

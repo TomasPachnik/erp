@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import sk.tomas.erp.entity.BaseEntity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,19 +41,35 @@ public class Utils {
         return Sort.Direction.ASC;
     }
 
-    public static String convert(Object object, Class clazz) {
+    public static String toJson(Object input, Class clazz) {
+        initializeMapper();
+        if (input != null) {
+            try {
+                return mapper.writeValueAsString(input);
+            } catch (JsonProcessingException e) {
+                log.warn("Cant toJson object " + clazz.getName() + " to JSON", e);
+            }
+        }
+        return null;
+    }
+
+    public static Object fromJson(String input, Class clazz) {
+        initializeMapper();
+        if (input != null) {
+            try {
+                return mapper.readValue(input, clazz);
+            } catch (IOException e) {
+                log.warn("Cant toJson JSON " + input + " to Object", e);
+            }
+        }
+        return null;
+    }
+
+    private static void initializeMapper() {
         if (mapper == null) {
             mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         }
-        if (object != null) {
-            try {
-                return mapper.writeValueAsString(object);
-            } catch (JsonProcessingException e) {
-                log.warn("Cant convert object " + clazz.getName() + " to JSON", e);
-            }
-        }
-        return null;
     }
 
 }

@@ -11,5 +11,5 @@ public class PagingOutput {
 
     private int pageIndex;
     private int pageSize;
-    
+
 }

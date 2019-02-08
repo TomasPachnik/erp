@@ -20,7 +20,7 @@ import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.exception.ValidationException;
-import sk.tomas.erp.repository.UsersRepository;
+import sk.tomas.erp.repository.UserRepository;
 import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.UserService;
 import sk.tomas.erp.util.Utils;
@@ -45,22 +45,22 @@ import static sk.tomas.erp.validator.UserServiceValidator.*;
 public class UserServiceImpl implements UserService {
 
     private ModelMapper mapper;
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private AuditService auditService;
 
     @Autowired
-    public UserServiceImpl(ModelMapper mapper, UsersRepository usersRepository,
+    public UserServiceImpl(ModelMapper mapper, UserRepository userRepository,
                            PasswordEncoder passwordEncoder, AuditService auditService) {
         this.mapper = mapper;
-        this.usersRepository = usersRepository;
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditService = auditService;
     }
 
     @Override
     public List<User> all() {
-        List<UserEntity> all = usersRepository.findAll();
+        List<UserEntity> all = userRepository.findAll();
         Type listType = new TypeToken<List<User>>() {
         }.getType();
         return mapper.map(all, listType);
@@ -75,15 +75,15 @@ public class UserServiceImpl implements UserService {
         try {
             UserEntity userEntity = mapper.map(user, UserEntity.class);
             if (user.getUuid() != null) {
-                Optional<UserEntity> byId = usersRepository.findById(user.getUuid());
+                Optional<UserEntity> byId = userRepository.findById(user.getUuid());
                 if (byId.isPresent()) {
                     oldUser = byId.get();
-                    userEntityOldString = Utils.convert(oldUser, UserEntity.class);
-                    if ("admin".equals(byId.get().getLogin()) && !"admin".equals(user.getLogin())) {
+                    userEntityOldString = Utils.toJson(oldUser, UserEntity.class);
+                    if ("admin".equals(byId.get().getUsername()) && !"admin".equals(user.getUsername())) {
                         throw new ValidationException("Admin username can not be changed!");
                     }
 
-                    if ("admin".equals(byId.get().getLogin()) && !user.isEnabled()) {
+                    if ("admin".equals(byId.get().getUsername()) && !user.isEnabled()) {
                         throw new ValidationException("Admin account can not be disabled!");
                     }
                 } else {
@@ -92,14 +92,14 @@ public class UserServiceImpl implements UserService {
                 byId.ifPresent(userEntity1 -> userEntity.setPassword(userEntity1.getPassword()));
                 byId.ifPresent(userEntity1 -> userEntity.setRoles(userEntity1.getRoles()));
             } else {
-                userEntity.setPassword(passwordEncoder.encode(user.getLogin() + "!!!"));
+                userEntity.setPassword(passwordEncoder.encode(user.getUsername() + "!!!"));
                 userEntity.setRoles(Collections.singletonList("ROLE_USER"));
             }
 
-            UUID uuid = usersRepository.save(userEntity).getUuid();
-            String userEntityNewString = Utils.convert(usersRepository.getOne(uuid), UserEntity.class);
+            UUID uuid = userRepository.save(userEntity).getUuid();
+            String userEntityNewString = Utils.toJson(userRepository.getOne(uuid), UserEntity.class);
             auditService.log(UserEntity.class, getLoggedUser().getUuid(), userEntityOldString, userEntityNewString);
-            log.info(MessageFormat.format("User ''{0}'' was {1} by ''{2}''.", user.getLogin(), createdUpdated(oldUser), getByToken().getLogin()));
+            log.info(MessageFormat.format("User ''{0}'' was {1} by ''{2}''.", user.getUsername(), createdUpdated(oldUser), getByToken().getUsername()));
             return uuid;
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User get(UUID uuid) {
         validateUuid(uuid);
-        return usersRepository.findById(uuid)
+        return userRepository.findById(uuid)
                 .map(userEntity -> mapper.map(userEntity, User.class))
                 .orElseThrow(() -> new ResourceNotFoundException(User.class.getSimpleName() + " not found with id " + uuid));
     }
@@ -121,11 +121,11 @@ public class UserServiceImpl implements UserService {
         validateUuid(uuid);
         try {
             User user = get(uuid);
-            String userEntityString = Utils.convert(user, UserEntity.class);
-            String login = user.getLogin();
+            String userEntityString = Utils.toJson(user, UserEntity.class);
+            String login = user.getUsername();
             auditService.log(UserEntity.class, getLoggedUser().getUuid(), userEntityString, null);
-            usersRepository.deleteById(uuid);
-            log.info(MessageFormat.format("User ''{0}'' was deleted by ''{1}''.", login, getLoggedUser().getLogin()));
+            userRepository.deleteById(uuid);
+            log.info(MessageFormat.format("User ''{0}'' was deleted by ''{1}''.", login, getLoggedUser().getUsername()));
             return true;
         } catch (EmptyResultDataAccessException | EntityNotFoundException | ResourceNotFoundException e) {
             return false;
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             String currentUserName = authentication.getName();
-            List<UserEntity> userEntities = usersRepository.find(currentUserName);
+            List<UserEntity> userEntities = userRepository.find(currentUserName);
             if (userEntities.size() == 1) {
                 return userEntities.get(0);
             }
@@ -150,23 +150,23 @@ public class UserServiceImpl implements UserService {
     public Result changePassword(ChangePassword changePassword) {
         validatePassword(changePassword);
         UserEntity loggedUser = getLoggedUser();
-        String loggedUserOldString = Utils.convert(loggedUser, UserEntity.class);
+        String loggedUserOldString = Utils.toJson(loggedUser, UserEntity.class);
         if (passwordEncoder.matches(changePassword.getOldPassword(), loggedUser.getPassword())) {
             loggedUser.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
-            usersRepository.save(loggedUser);
-            log.info(MessageFormat.format("User ''{0}'' successfully changed password.", loggedUser.getLogin()));
-            String loggedUserNewString = Utils.convert(usersRepository.getOne(loggedUser.getUuid()), UserEntity.class);
+            userRepository.save(loggedUser);
+            log.info(MessageFormat.format("User ''{0}'' successfully changed password.", loggedUser.getUsername()));
+            String loggedUserNewString = Utils.toJson(userRepository.getOne(loggedUser.getUuid()), UserEntity.class);
             auditService.log(UserEntity.class, loggedUser.getUuid(), loggedUserOldString, loggedUserNewString);
             return new Result(true);
         }
-        log.info(MessageFormat.format("User ''{0}'' tried to change password, but was not successful.", loggedUser.getLogin()));
+        log.info(MessageFormat.format("User ''{0}'' tried to change password, but was not successful.", loggedUser.getUsername()));
         return new Result(false);
     }
 
     @Override
     public User getByLogin(String login) {
         validateLogin(login);
-        List<UserEntity> userEntities = usersRepository.find(login);
+        List<UserEntity> userEntities = userRepository.find(login);
         if (userEntities.size() == 1) {
             return mapper.map(userEntities.get(0), User.class);
         }

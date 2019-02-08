@@ -1,14 +1,14 @@
 package sk.tomas.erp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import sk.tomas.erp.bo.SimpleGrantedAuthorityImpl;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -26,10 +26,11 @@ import static java.util.stream.Collectors.toList;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user_table")
+@JsonIgnoreProperties(value = {"accountNonExpired", "accountNonLocked", "credentialsNonExpired"})
 public class UserEntity extends BaseEntity implements UserDetails {
 
     @Column(unique = true)
-    private String login;
+    private String username;
     private String name;
     private String phone;
     private String email;
@@ -38,17 +39,17 @@ public class UserEntity extends BaseEntity implements UserDetails {
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @Builder.Default
-    @ElementCollection(targetClass=String.class)
+    @ElementCollection(targetClass = String.class)
     private List<String> roles = new ArrayList<>();
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream().map(SimpleGrantedAuthority::new).collect(toList());
+    public Collection<? extends SimpleGrantedAuthorityImpl> getAuthorities() {
+        return this.roles.stream().map(SimpleGrantedAuthorityImpl::new).collect(toList());
     }
 
     @Override
     public String getUsername() {
-        return login;
+        return username;
     }
 
     public String getPassword() {
@@ -78,7 +79,7 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @Override
     public String toString() {
         return "UserEntity{" +
-                "login='" + login + '\'' +
+                "username='" + username + '\'' +
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +

@@ -3,7 +3,7 @@ package sk.tomas.erp.bo;
 import lombok.Data;
 
 @Data
-public class Address extends Base{
+public class Address extends Base {
 
     private String street;
     private String houseNumber;

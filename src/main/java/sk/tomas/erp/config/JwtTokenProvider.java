@@ -40,7 +40,7 @@ public class JwtTokenProvider {
 
     public String createToken(UserEntity userEntity, List<String> roles) {
 
-        Claims claims = Jwts.claims().setSubject(userEntity.getLogin());
+        Claims claims = Jwts.claims().setSubject(userEntity.getUsername());
         claims.put("roles", roles);
         claims.put("name", userEntity.getName());
 

@@ -103,10 +103,10 @@ public class InvoiceServiceImpl implements InvoiceService {
             InvoiceEntity invoiceEntity = invoiceRepository.findByUuid(uuid, userService.getLoggedUser().getUuid());
             if (invoiceEntity != null) {
                 String name = invoiceEntity.getName();
-                String invoiceEntityString = Utils.convert(invoiceEntity, InvoiceEntity.class);
+                String invoiceEntityString = Utils.toJson(invoiceEntity, InvoiceEntity.class);
                 invoiceRepository.delete(invoiceEntity);
                 auditService.log(InvoiceEntity.class, userService.getLoggedUser().getUuid(), invoiceEntityString, null);
-                log.info(MessageFormat.format("Invoice ''{0}'' was deleted by ''{1}''.", name, userService.getLoggedUser().getLogin()));
+                log.info(MessageFormat.format("Invoice ''{0}'' was deleted by ''{1}''.", name, userService.getLoggedUser().getUsername()));
                 return true;
             }
             return false;
@@ -125,7 +125,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         //if updating entry, check, if updater is owner
         if (invoiceInput.getUuid() != null) {
             oldInvoice = invoiceRepository.findByUuid(invoiceInput.getUuid(), userService.getLoggedUser().getUuid());
-            invoiceEntityOldString = Utils.convert(oldInvoice, InvoiceEntity.class);
+            invoiceEntityOldString = Utils.toJson(oldInvoice, InvoiceEntity.class);
         }
         Invoice invoice = mapper.map(invoiceInput, Invoice.class);
         InvoiceEntity invoiceEntity = mapper.map(invoice, InvoiceEntity.class);
@@ -137,9 +137,9 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoiceEntity.setTotal(calculateTotal(invoiceEntity));
             InvoiceEntity save = invoiceRepository.save(invoiceEntity);
             InvoiceEntity newOne = invoiceRepository.getOne(save.getUuid());
-            String invoiceEntityNewString = Utils.convert(newOne, InvoiceEntity.class);
+            String invoiceEntityNewString = Utils.toJson(newOne, InvoiceEntity.class);
             log.info(MessageFormat.format("Invoice ''{0}'' was {1} by ''{2}''.",
-                    invoiceInput.getName(), createdUpdated(oldInvoice), userService.getLoggedUser().getLogin()));
+                    invoiceInput.getName(), createdUpdated(oldInvoice), userService.getLoggedUser().getUsername()));
 
             auditService.log(InvoiceEntity.class, loggedUser.getUuid(), invoiceEntityOldString, invoiceEntityNewString);
             return save.getUuid();

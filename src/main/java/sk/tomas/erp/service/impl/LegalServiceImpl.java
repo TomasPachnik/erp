@@ -110,7 +110,7 @@ public class LegalServiceImpl implements LegalService {
         if (legal.getUuid() != null) {
             Legal legal1 = getLegal(legal.getUuid(), userService.getLoggedUser().getUuid(), legal.getClass());
             oldLegal = legalRepository.getOne(legal1.getUuid());
-            legalEntityOldString = Utils.convert(oldLegal, LegalEntity.class);
+            legalEntityOldString = Utils.toJson(oldLegal, LegalEntity.class);
         }
         try {
             LegalEntity legalEntity = mapper.map(legal, LegalEntity.class);
@@ -121,12 +121,12 @@ public class LegalServiceImpl implements LegalService {
             }
             legalEntity.setOwner(loggedUser.getUuid());
             UUID uuid = legalRepository.save(legalEntity).getUuid();
-            String legalEntityNewString = Utils.convert(legalRepository.getOne(uuid), LegalEntity.class);
+            String legalEntityNewString = Utils.toJson(legalRepository.getOne(uuid), LegalEntity.class);
             auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntityOldString, legalEntityNewString);
 
             String legalType = legalEntity.isSupplierFlag() ? "Supplier" : "Customer";
             log.info(MessageFormat.format("{0} ''{1}'' was {2} by ''{3}''.",
-                    legalType, legal.getName(), createdUpdated(oldLegal), userService.getLoggedUser().getLogin()));
+                    legalType, legal.getName(), createdUpdated(oldLegal), userService.getLoggedUser().getUsername()));
 
             return uuid;
         } catch (DataIntegrityViolationException e) {
@@ -163,12 +163,12 @@ public class LegalServiceImpl implements LegalService {
             LegalEntity legalEntity = legalRepository.findByUuid(uuid, userService.getLoggedUser().getUuid(), supplier);
             if (legalEntity != null) {
                 String name = legalEntity.getName();
-                String legalEntityString = Utils.convert(legalEntity, LegalEntity.class);
+                String legalEntityString = Utils.toJson(legalEntity, LegalEntity.class);
                 auditService.log(LegalEntity.class, userService.getLoggedUser().getUuid(), legalEntityString, null);
                 legalRepository.delete(legalEntity);
                 String legalType = supplier ? "Supplier" : "Customer";
                 log.info(MessageFormat.format("{0} ''{1}'' was deleted by ''{2}''.",
-                        legalType, name, userService.getLoggedUser().getLogin()));
+                        legalType, name, userService.getLoggedUser().getUsername()));
                 return true;
             }
             return false;

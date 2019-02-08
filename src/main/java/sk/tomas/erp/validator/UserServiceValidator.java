@@ -13,7 +13,7 @@ public class UserServiceValidator {
 
     public static void validateInput(User user) {
         BaseValidator.validateNull(user, "User");
-        validateLogin(user.getLogin());
+        validateLogin(user.getUsername());
         validate(user.getName(), user.getEmail());
     }
 

@@ -77,7 +77,7 @@ public class PositiveFlowTest {
 
     private UUID createUserByAdmin() {
         User user = new User();
-        user.setLogin("login");
+        user.setUsername("login");
         user.setName("name");
         user.setEmail("email@email");
         user.setPhone("phone");
