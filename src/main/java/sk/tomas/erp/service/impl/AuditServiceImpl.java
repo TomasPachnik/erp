@@ -13,7 +13,6 @@ import sk.tomas.erp.service.DateService;
 import sk.tomas.erp.util.Utils;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.fromJson;
@@ -69,8 +68,7 @@ public class AuditServiceImpl implements AuditService {
     @Transactional
     public void restore() {
         deleteAllDataExceptAudit();
-        List<AuditEntity> all = auditRepository.findAll(new Sort(Sort.Direction.ASC, "date"));
-        all.forEach(this::restoreItemFromAudit);
+        auditRepository.findAll(new Sort(Sort.Direction.ASC, "date")).forEach(this::restoreItemFromAudit);
         log.info("Successfully performed data reload from audit.");
     }
 
