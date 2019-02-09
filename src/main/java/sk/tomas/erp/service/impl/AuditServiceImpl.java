@@ -6,11 +6,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
-import sk.tomas.erp.entity.AuditEntity;
-import sk.tomas.erp.entity.BaseEntity;
+import sk.tomas.erp.entity.*;
 import sk.tomas.erp.repository.*;
 import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.DateService;
+import sk.tomas.erp.util.Utils;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -52,11 +52,24 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
+    public void backup() {
+        auditRepository.deleteAll();
+        auditRepository.flush();
+        userRepository.findAll().forEach(entity ->
+                log(UserEntity.class, entity.getUuid(), null, Utils.toJson(entity, UserEntity.class)));
+        legalRepository.findAll().forEach(entity ->
+                log(LegalEntity.class, entity.getOwner(), null, Utils.toJson(entity, LegalEntity.class)));
+        invoiceRepository.findAll().forEach(entity ->
+                log(InvoiceEntity.class, entity.getOwner(), null, Utils.toJson(entity, InvoiceEntity.class)));
+        log.info("Successfully performed data backup to audit.");
+    }
+
+    @Override
     @Transactional
     public void restore() {
         deleteAllDataExceptAudit();
         List<AuditEntity> all = auditRepository.findAll(new Sort(Sort.Direction.ASC, "date"));
-        all.forEach(this::restoreItem);
+        all.forEach(this::restoreItemFromAudit);
         log.info("Successfully performed data reload from audit.");
     }
 
@@ -71,7 +84,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @SuppressWarnings("unchecked")
-    private void restoreItem(AuditEntity entity) {
+    private void restoreItemFromAudit(AuditEntity entity) {
         Class<?> clazz;
         try {
             clazz = Class.forName(entity.getClassName());

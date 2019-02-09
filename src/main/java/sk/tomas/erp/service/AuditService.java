@@ -8,6 +8,8 @@ public interface AuditService {
 
     void log(Class<? extends BaseEntity> clazz, UUID owner, String oldValue, String newValue);
 
+    void backup();
+
     void restore();
 
 }
