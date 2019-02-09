@@ -52,6 +52,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
+    @Transactional
     public void backup() {
         auditRepository.deleteAll();
         auditRepository.flush();
