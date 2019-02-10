@@ -17,7 +17,6 @@ import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
-import sk.tomas.erp.repository.AssetRepository;
 import sk.tomas.erp.repository.InvoiceRepository;
 import sk.tomas.erp.repository.LegalRepository;
 import sk.tomas.erp.service.AuditService;
@@ -46,7 +45,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final UserServiceImpl userService;
     private InvoiceRepository invoiceRepository;
     private final LegalRepository legalRepository;
-    private final AssetRepository assetRepository;
     private AuditService auditService;
 
     private final List<String> tableProperties;
@@ -54,12 +52,11 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Autowired
     public InvoiceServiceImpl(ModelMapper mapper, InvoiceRepository invoiceRepository,
                               UserServiceImpl userService, LegalRepository legalRepository,
-                              AssetRepository assetRepository, AuditService auditService) {
+                              AuditService auditService) {
         this.mapper = mapper;
         this.invoiceRepository = invoiceRepository;
         this.userService = userService;
         this.legalRepository = legalRepository;
-        this.assetRepository = assetRepository;
         this.auditService = auditService;
         tableProperties = new LinkedList<>();
         fillTableProperties();

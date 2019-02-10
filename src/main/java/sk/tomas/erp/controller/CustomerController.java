@@ -4,10 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sk.tomas.erp.bo.Customer;
+import sk.tomas.erp.bo.Paging;
+import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.service.LegalService;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,9 +23,9 @@ public class CustomerController {
         this.legalService = legalService;
     }
 
-    @GetMapping("/")
-    public List<Customer> all() {
-        return legalService.allCustomers();
+    @GetMapping("/all")
+    public Paging all(@RequestBody PagingInput input) {
+        return legalService.allCustomers(input);
     }
 
     @GetMapping("/get/{uuid}")

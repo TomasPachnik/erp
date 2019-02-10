@@ -6,16 +6,16 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
-import sk.tomas.erp.bo.ChangePassword;
-import sk.tomas.erp.bo.ChangeUser;
-import sk.tomas.erp.bo.Result;
-import sk.tomas.erp.bo.User;
+import sk.tomas.erp.bo.*;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
@@ -37,6 +37,7 @@ import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.createdUpdated;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
+import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput;
 import static sk.tomas.erp.validator.UserServiceValidator.*;
 
 @Slf4j
@@ -187,6 +188,28 @@ public class UserServiceImpl implements UserService {
         byToken.setEmail(changeUser.getEmail());
         byToken.setPhone(changeUser.getPhone());
         return save(byToken);
+    }
+
+    @Override
+    public Paging allUsers(PagingInput input) {
+
+        validatePagingInput(input);
+        Page<UserEntity> page = userRepository.findAllBy(
+                PageRequest.of(input.getPageIndex(), input.getPageSize(), getSortFromInput(input)));
+
+        Paging paging = new Paging();
+        paging.setTotal((int) page.getTotalElements());
+
+        paging.setPageable(new PagingOutput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
+        Type listType = new TypeToken<List<User>>() {
+        }.getType();
+        paging.setContent(mapper.map(page.getContent(), listType));
+        return paging;
+    }
+
+    private Sort getSortFromInput(PagingInput input) {
+        String sort = "username";
+        return new Sort(Utils.getSortDirection(input.getSortDirection()), sort);
     }
 
 }

@@ -6,11 +6,12 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
-import sk.tomas.erp.bo.Customer;
-import sk.tomas.erp.bo.Legal;
-import sk.tomas.erp.bo.Supplier;
+import sk.tomas.erp.bo.*;
 import sk.tomas.erp.entity.LegalEntity;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.createdUpdated;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
+import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput;
 import static sk.tomas.erp.validator.LegalServiceValidator.validateLegal;
 
 @Slf4j
@@ -94,6 +96,16 @@ public class LegalServiceImpl implements LegalService {
         return saveLegal(supplier);
     }
 
+    @Override
+    public Paging allSuppliers(PagingInput input) {
+        return getLegal(input, userService.getLoggedUser().getUuid(), Supplier.class);
+    }
+
+    @Override
+    public Paging allCustomers(PagingInput input) {
+        return getLegal(input, userService.getLoggedUser().getUuid(), Customer.class);
+    }
+
     private List<Legal> all(boolean supplier) {
         List<LegalEntity> all = legalRepository.all(userService.getLoggedUser().getUuid(), supplier);
         Type listType = new TypeToken<List<Legal>>() {
@@ -135,12 +147,26 @@ public class LegalServiceImpl implements LegalService {
         }
     }
 
-    private Legal getLegal(UUID uuid, UUID owner, boolean supplier) {
-        if (supplier) {
-            return getLegal(uuid, owner, Supplier.class);
+    private Paging getLegal(PagingInput input, UUID uuid, Class clazz) {
+        validatePagingInput(input);
+        Page<LegalEntity> page;
+        Type listType;
+        if (clazz == Supplier.class) {
+            page = legalRepository.findByOwnerAndSupplierFlag(userService.getLoggedUser().getUuid(),
+                    true, PageRequest.of(input.getPageIndex(), input.getPageSize(), getSortFromInput(input)));
+            listType = new TypeToken<List<Supplier>>() {
+            }.getType();
         } else {
-            return getLegal(uuid, owner, Customer.class);
+            page = legalRepository.findByOwnerAndSupplierFlag(userService.getLoggedUser().getUuid(),
+                    false, PageRequest.of(input.getPageIndex(), input.getPageSize(), getSortFromInput(input)));
+            listType = new TypeToken<List<Customer>>() {
+            }.getType();
         }
+        Paging paging = new Paging();
+        paging.setTotal((int) page.getTotalElements());
+        paging.setPageable(new PagingOutput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
+        paging.setContent(mapper.map(page.getContent(), listType));
+        return paging;
     }
 
     private Legal getLegal(UUID uuid, UUID owner, Class clazz) {
@@ -176,4 +202,10 @@ public class LegalServiceImpl implements LegalService {
             return false;
         }
     }
+
+    private Sort getSortFromInput(PagingInput input) {
+        return new Sort(Utils.getSortDirection(input.getSortDirection()), "name");
+    }
+
+
 }

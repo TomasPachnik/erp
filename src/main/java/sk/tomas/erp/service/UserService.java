@@ -1,9 +1,6 @@
 package sk.tomas.erp.service;
 
-import sk.tomas.erp.bo.ChangePassword;
-import sk.tomas.erp.bo.ChangeUser;
-import sk.tomas.erp.bo.Result;
-import sk.tomas.erp.bo.User;
+import sk.tomas.erp.bo.*;
 import sk.tomas.erp.entity.UserEntity;
 
 import java.util.List;
@@ -28,4 +25,6 @@ public interface UserService {
     User getByToken();
 
     UUID saveCurrent(ChangeUser changeUser);
+
+    Paging allUsers(PagingInput input);
 }

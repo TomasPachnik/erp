@@ -3,11 +3,12 @@ package sk.tomas.erp.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import sk.tomas.erp.bo.Paging;
+import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.bo.Supplier;
 import sk.tomas.erp.service.LegalService;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,9 +23,9 @@ public class SupplierController {
         this.legalService = legalService;
     }
 
-    @GetMapping("/")
-    public List<Supplier> all() {
-        return legalService.allSuppliers();
+    @GetMapping("/all")
+    public Paging all(@RequestBody PagingInput input) {
+        return legalService.allSuppliers(input);
     }
 
     @GetMapping("/get/{uuid}")

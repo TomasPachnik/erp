@@ -1,6 +1,8 @@
 package sk.tomas.erp.service;
 
 import sk.tomas.erp.bo.Customer;
+import sk.tomas.erp.bo.Paging;
+import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.bo.Supplier;
 
 import java.util.List;
@@ -23,4 +25,8 @@ public interface LegalService {
     UUID saveCustomer(Customer customer);
 
     UUID saveSupplier(Supplier supplier);
+
+    Paging allSuppliers(PagingInput input);
+
+    Paging allCustomers(PagingInput input);
 }
