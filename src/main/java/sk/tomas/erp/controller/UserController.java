@@ -20,7 +20,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/all")
+    @PostMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Paging all(@RequestBody PagingInput input) {
         return userService.allUsers(input);

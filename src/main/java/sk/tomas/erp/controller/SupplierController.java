@@ -9,6 +9,7 @@ import sk.tomas.erp.bo.Supplier;
 import sk.tomas.erp.service.LegalService;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,7 +25,12 @@ public class SupplierController {
     }
 
     @GetMapping("/all")
-    public Paging all(@RequestBody PagingInput input) {
+    public List<Supplier> all() {
+        return legalService.allSuppliers();
+    }
+
+    @PostMapping("/all")
+    public Paging allWithPagination(@RequestBody PagingInput input) {
         return legalService.allSuppliers(input);
     }
 
