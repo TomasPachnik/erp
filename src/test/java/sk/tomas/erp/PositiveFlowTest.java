@@ -48,6 +48,17 @@ public class PositiveFlowTest {
         UUID invoice = createInvoice(supplier, customer);
         pdfService.generatePdf(invoiceService.get(invoice));
         updateInvoice(invoice);
+
+        userService.all();
+        legalService.allCustomers();
+        legalService.allSuppliers();
+        invoiceService.all();
+
+        userService.allUsers(new PagingInput(null, null, null, 0, 10));
+        legalService.allCustomers(new PagingInput(null, null, null, 0, 10));
+        legalService.allSuppliers(new PagingInput(null, null, null, 0, 10));
+        invoiceService.allInvoices(new PagingInput(null, null, null, 0, 10));
+
         deleteInvoice(invoice);
         deleteSupplier(supplier);
         deleteCustomer(customer);

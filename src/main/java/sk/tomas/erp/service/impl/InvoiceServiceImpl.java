@@ -11,7 +11,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
-import sk.tomas.erp.bo.*;
+import sk.tomas.erp.bo.Invoice;
+import sk.tomas.erp.bo.InvoiceInput;
+import sk.tomas.erp.bo.Paging;
+import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.entity.AssetEntity;
 import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.entity.UserEntity;
@@ -32,6 +35,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.createdUpdated;
+import static sk.tomas.erp.util.Utils.mapPaging;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 import static sk.tomas.erp.validator.InvoiceServiceValidator.validateInvoice;
 import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput;
@@ -41,13 +45,12 @@ import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput
 @MethodCallLogger
 public class InvoiceServiceImpl implements InvoiceService {
 
-    private ModelMapper mapper;
     private final UserServiceImpl userService;
-    private InvoiceRepository invoiceRepository;
     private final LegalRepository legalRepository;
-    private AuditService auditService;
-
     private final List<String> tableProperties;
+    private ModelMapper mapper;
+    private InvoiceRepository invoiceRepository;
+    private AuditService auditService;
 
     @Autowired
     public InvoiceServiceImpl(ModelMapper mapper, InvoiceRepository invoiceRepository,
@@ -69,6 +72,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public List<Invoice> all() {
         List<InvoiceEntity> all = invoiceRepository.all(userService.getLoggedUser().getUuid());
         Type listType = new TypeToken<List<Invoice>>() {
@@ -77,19 +81,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Paging all(PagingInput input) {
+    @Transactional
+    public Paging allInvoices(PagingInput input) {
         validatePagingInput(input);
         Page<InvoiceEntity> page = invoiceRepository.findByOwner(userService.getLoggedUser().getUuid(),
                 PageRequest.of(input.getPageIndex(), input.getPageSize(), getSortFromInput(input)));
-
-        Paging paging = new Paging();
-        paging.setTotal((int) page.getTotalElements());
-
-        paging.setPageable(new PagingOutput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
-        Type listType = new TypeToken<List<Invoice>>() {
-        }.getType();
-        paging.setContent(mapper.map(page.getContent(), listType));
-        return paging;
+        return mapPaging(page, mapper, new TypeToken<List<Invoice>>() {
+        }.getType());
     }
 
     @Override

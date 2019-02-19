@@ -37,7 +37,7 @@ public class InvoiceController {
 
     @PostMapping(path = "/all")
     public Paging all(@RequestBody PagingInput input) {
-        return invoiceService.all(input);
+        return invoiceService.allInvoices(input);
     }
 
     @GetMapping("/remove/{uuid}")

@@ -36,6 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.createdUpdated;
+import static sk.tomas.erp.util.Utils.mapPaging;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput;
 import static sk.tomas.erp.validator.UserServiceValidator.*;
@@ -192,19 +193,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Paging allUsers(PagingInput input) {
-
         validatePagingInput(input);
         Page<UserEntity> page = userRepository.findAllBy(
                 PageRequest.of(input.getPageIndex(), input.getPageSize(), getSortFromInput(input)));
-
-        Paging paging = new Paging();
-        paging.setTotal((int) page.getTotalElements());
-
-        paging.setPageable(new PagingOutput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
-        Type listType = new TypeToken<List<User>>() {
-        }.getType();
-        paging.setContent(mapper.map(page.getContent(), listType));
-        return paging;
+        return mapPaging(page, mapper, new TypeToken<List<User>>() {
+        }.getType());
     }
 
     private Sort getSortFromInput(PagingInput input) {

@@ -14,7 +14,7 @@ public interface InvoiceService {
 
     List<Invoice> all();
 
-    Paging all(PagingInput input);
+    Paging allInvoices(PagingInput input);
 
     boolean deleteByUuid(UUID uuid);
 

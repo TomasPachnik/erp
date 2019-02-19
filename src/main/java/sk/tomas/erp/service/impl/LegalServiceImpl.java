@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.createdUpdated;
+import static sk.tomas.erp.util.Utils.mapPaging;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
 import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput;
 import static sk.tomas.erp.validator.LegalServiceValidator.validateLegal;
@@ -37,8 +38,8 @@ import static sk.tomas.erp.validator.LegalServiceValidator.validateLegal;
 @MethodCallLogger
 public class LegalServiceImpl implements LegalService {
 
-    private ModelMapper mapper;
     private final UserServiceImpl userService;
+    private ModelMapper mapper;
     private LegalRepository legalRepository;
     private AuditService auditService;
 
@@ -162,11 +163,7 @@ public class LegalServiceImpl implements LegalService {
             listType = new TypeToken<List<Customer>>() {
             }.getType();
         }
-        Paging paging = new Paging();
-        paging.setTotal((int) page.getTotalElements());
-        paging.setPageable(new PagingOutput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
-        paging.setContent(mapper.map(page.getContent(), listType));
-        return paging;
+        return mapPaging(page, mapper, listType);
     }
 
     private Legal getLegal(UUID uuid, UUID owner, Class clazz) {
