@@ -98,12 +98,12 @@ public class LegalServiceImpl implements LegalService {
 
     @Override
     public Paging allSuppliers(PagingInput input) {
-        return getLegal(input, userService.getLoggedUser().getUuid(), Supplier.class);
+        return getLegal(input, Supplier.class);
     }
 
     @Override
     public Paging allCustomers(PagingInput input) {
-        return getLegal(input, userService.getLoggedUser().getUuid(), Customer.class);
+        return getLegal(input, Customer.class);
     }
 
     private List<Legal> all(boolean supplier) {
@@ -147,7 +147,7 @@ public class LegalServiceImpl implements LegalService {
         }
     }
 
-    private Paging getLegal(PagingInput input, UUID uuid, Class clazz) {
+    private Paging getLegal(PagingInput input, Class clazz) {
         validatePagingInput(input);
         Page<LegalEntity> page;
         Type listType;
