@@ -52,5 +52,6 @@ public class EmailServiceImpl implements EmailService {
             throw new EmailException("Email was not sent!");
         }
         emailSender.send(message);
+        log.info("Send audit data to {0}.", toEmailAddress);
     }
 }
