@@ -29,6 +29,7 @@ public class InvoiceEntity extends OwnerEntity {
     private Date dateOfIssue;
     private Date deliveryDate;
     private Date dueDate;
+    private Date payDate;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn
     private List<AssetEntity> assets;

@@ -19,8 +19,8 @@ public class Invoice extends Base {
     private Date dateOfIssue;
     private Date deliveryDate;
     private Date dueDate;
+    private Date payDate;
     private List<Asset> assets;
     private String note;
     private BigDecimal total;
-
 }
