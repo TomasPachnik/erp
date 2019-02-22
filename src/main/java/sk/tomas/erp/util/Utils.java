@@ -13,11 +13,14 @@ import sk.tomas.erp.bo.Paging;
 import sk.tomas.erp.bo.PagingOutput;
 import sk.tomas.erp.entity.BaseEntity;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.GZIPOutputStream;
 
 public class Utils {
 
@@ -81,6 +84,14 @@ public class Utils {
         paging.setPageable(new PagingOutput(page.getPageable().getPageNumber(), page.getPageable().getPageSize()));
         paging.setContent(mapper.map(page.getContent(), listType));
         return paging;
+    }
+
+    public static byte[] zip(Object o) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream objectOut = new ObjectOutputStream(new GZIPOutputStream(baos));
+        objectOut.writeObject(o);
+        objectOut.close();
+        return baos.toByteArray();
     }
 
 }

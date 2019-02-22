@@ -6,16 +6,21 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
+import sk.tomas.erp.bo.Result;
+import sk.tomas.erp.bo.StringInput;
 import sk.tomas.erp.entity.*;
 import sk.tomas.erp.repository.*;
 import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.DateService;
+import sk.tomas.erp.service.EmailService;
 import sk.tomas.erp.util.Utils;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.fromJson;
+import static sk.tomas.erp.validator.AuditValidator.validateStringInput;
 
 @Slf4j
 @Service
@@ -24,15 +29,20 @@ public class AuditServiceImpl implements AuditService {
 
     private AuditRepository auditRepository;
     private DateService dateService;
+    private EmailService emailService;
     private InvoiceRepository invoiceRepository;
     private LegalRepository legalRepository;
     private UserRepository userRepository;
     private GenericRepository genericRepository;
 
+
     @Autowired
-    public AuditServiceImpl(AuditRepository auditRepository, DateService dateService, InvoiceRepository invoiceRepository, LegalRepository legalRepository, UserRepository userRepository, GenericRepository genericRepository) {
+    public AuditServiceImpl(AuditRepository auditRepository, DateService dateService, EmailService emailService,
+                            InvoiceRepository invoiceRepository, LegalRepository legalRepository,
+                            UserRepository userRepository, GenericRepository genericRepository) {
         this.auditRepository = auditRepository;
         this.dateService = dateService;
+        this.emailService = emailService;
         this.invoiceRepository = invoiceRepository;
         this.legalRepository = legalRepository;
         this.userRepository = userRepository;
@@ -70,6 +80,18 @@ public class AuditServiceImpl implements AuditService {
         deleteAllDataExceptAudit();
         auditRepository.findAll(new Sort(Sort.Direction.ASC, "date")).forEach(this::restoreItemFromAudit);
         log.info("Successfully performed data reload from audit.");
+    }
+
+    @Override
+    public List<AuditEntity> all() {
+        return auditRepository.findAll();
+    }
+
+    @Override
+    public Result sendAuditData(StringInput input) {
+        validateStringInput(input);
+        emailService.sendAuditData(input.getValue());
+        return new Result(true);
     }
 
 
