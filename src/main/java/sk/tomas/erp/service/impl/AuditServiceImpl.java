@@ -90,7 +90,7 @@ public class AuditServiceImpl implements AuditService {
     @Override
     public Result sendAuditData(StringInput input) {
         validateStringInput(input);
-        emailService.sendAuditData(input.getValue());
+        emailService.sendAuditData(input.getValue(), all());
         return new Result(true);
     }
 
