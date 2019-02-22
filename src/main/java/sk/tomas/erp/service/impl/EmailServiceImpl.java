@@ -44,7 +44,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setTo(toEmailAddress);
             helper.setSubject("Audit data from " + dateService.getActualDate());
             helper.setText("Audit data in attachment.");
-            byte[] zip = zip(list);
+            byte[] zip = zip(auditEntities);
             ByteArrayDataSource attachment = new ByteArrayDataSource(new ByteArrayInputStream(zip), "application/octet-stream");
             helper.addAttachment("auditData.zip", attachment);
         } catch (MessagingException | IOException e) {
