@@ -1,5 +1,6 @@
 package sk.tomas.erp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -7,6 +8,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "legal")
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer"})
 public class LegalEntity extends OwnerEntity {
 
     private boolean supplierFlag;
