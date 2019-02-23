@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import sk.tomas.erp.annotations.MethodCallLogger;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.StringInput;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static sk.tomas.erp.util.Utils.fromJson;
+import static sk.tomas.erp.util.Utils.unzip;
 import static sk.tomas.erp.validator.AuditValidator.validateStringInput;
 
 @Slf4j
@@ -91,6 +93,17 @@ public class AuditServiceImpl implements AuditService {
     public Result sendAuditData(StringInput input) {
         validateStringInput(input);
         emailService.sendAuditData(input.getValue(), all());
+        return new Result(true);
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public Result updateAuditData(MultipartFile file) {
+        List<AuditEntity> list = (List<AuditEntity>) unzip(file);
+        auditRepository.deleteAll();
+        auditRepository.flush();
+        list.forEach(entity -> auditRepository.save(entity));
         return new Result(true);
     }
 

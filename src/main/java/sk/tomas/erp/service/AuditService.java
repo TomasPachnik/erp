@@ -1,5 +1,6 @@
 package sk.tomas.erp.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.StringInput;
 import sk.tomas.erp.entity.AuditEntity;
@@ -19,4 +20,8 @@ public interface AuditService {
     List<AuditEntity> all();
 
     Result sendAuditData(StringInput input);
+
+    Result updateAuditData(MultipartFile file);
+
+
 }

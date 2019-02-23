@@ -9,17 +9,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.multipart.MultipartFile;
 import sk.tomas.erp.bo.Paging;
 import sk.tomas.erp.bo.PagingOutput;
 import sk.tomas.erp.entity.BaseEntity;
+import sk.tomas.erp.exception.EmailException;
+import sk.tomas.erp.exception.ZipException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class Utils {
@@ -86,12 +88,38 @@ public class Utils {
         return paging;
     }
 
-    public static byte[] zip(Object o) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream objectOut = new ObjectOutputStream(new GZIPOutputStream(baos));
-        objectOut.writeObject(o);
-        objectOut.close();
-        return baos.toByteArray();
+    public static byte[] zip(Object o) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream objectOut = new ObjectOutputStream(new GZIPOutputStream(baos));
+            objectOut.writeObject(o);
+            objectOut.close();
+            return baos.toByteArray();
+        } catch (IOException e) {
+            log.error("Email send exception:", e);
+            throw new EmailException("Email was not sent!");
+        }
+    }
+
+    public static Object unzip(MultipartFile file) {
+        try {
+            return unzip(file.getBytes());
+        } catch (IOException e) {
+            log.error("Error parsing zip: ", e);
+            throw new ZipException("Error parsing zip file.");
+        }
+    }
+
+    public static Object unzip(byte[] file) {
+        GZIPInputStream gis;
+        try {
+            gis = new GZIPInputStream(new ByteArrayInputStream(file));
+            ObjectInputStream is = new ObjectInputStream(gis);
+            return is.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            log.error("Error parsing zip: ", e);
+            throw new ZipException("Error parsing zip file.");
+        }
     }
 
 }

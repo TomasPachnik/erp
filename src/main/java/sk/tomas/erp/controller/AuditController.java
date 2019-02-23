@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sk.tomas.erp.bo.Result;
 import sk.tomas.erp.bo.StringInput;
 import sk.tomas.erp.service.AuditService;
@@ -32,6 +33,13 @@ public class AuditController {
     public Result restore() {
         auditService.restore();
         return new Result(true);
+    }
+
+
+    @PostMapping("/upload")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Result handleFileUpload(@RequestParam("file") MultipartFile file) {
+        return auditService.updateAuditData(file);
     }
 
     @PostMapping(path = "/auditEmail")
