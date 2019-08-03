@@ -16,11 +16,10 @@ import sk.tomas.erp.entity.BaseEntity;
 import sk.tomas.erp.exception.EmailException;
 import sk.tomas.erp.exception.ZipException;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -120,6 +119,13 @@ public class Utils {
             log.error("Error parsing zip: ", e);
             throw new ZipException("Error parsing zip file.");
         }
+    }
+
+    public static Date add12hours(Date date){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.HOUR_OF_DAY, 12);
+        return calendar.getTime();
     }
 
 }

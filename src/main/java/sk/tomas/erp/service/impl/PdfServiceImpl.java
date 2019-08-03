@@ -22,6 +22,8 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import static sk.tomas.erp.util.Utils.add12hours;
+
 @Slf4j
 @Service
 @MethodCallLogger
@@ -120,9 +122,9 @@ public class PdfServiceImpl implements PdfService {
         params.put("deliveryDate", translations.get("deliveryDate"));
         params.put("dueDate", translations.get("dueDate"));
 
-        params.put("dateOfIssueValue", new java.sql.Date(invoice.getDateOfIssue().getTime()));
-        params.put("deliveryDateValue", new java.sql.Date(invoice.getDeliveryDate().getTime()));
-        params.put("dueDateValue", new java.sql.Date(invoice.getDueDate().getTime()));
+        params.put("dateOfIssueValue", new java.sql.Date(add12hours(invoice.getDateOfIssue()).getTime()));
+        params.put("deliveryDateValue", new java.sql.Date(add12hours(invoice.getDeliveryDate()).getTime()));
+        params.put("dueDateValue", new java.sql.Date(add12hours(invoice.getDueDate()).getTime()));
 
         params.put("assets", assets);
         params.put("customer.total", invoice.getTotal());
