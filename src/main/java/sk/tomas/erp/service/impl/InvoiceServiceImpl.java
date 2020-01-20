@@ -166,7 +166,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (tableProperties.contains(input.getSort())) {
             sort = input.getSort();
         }
-        return new Sort(Utils.getSortDirection(input.getSortDirection()), sort);
+        return new Sort(Utils.getSortDirection("desc"), sort);
     }
 
     private void fillTableProperties() {
