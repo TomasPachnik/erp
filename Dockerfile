@@ -1,5 +1,5 @@
-# docker build -f Dockerfile -t tomas487/erp:0.1 .
-FROM openjdk:8-jre
+# docker build -f Dockerfile -t tomas487/erp-arm:0.1 .
+FROM openjdk:8-jre-alpine
 MAINTAINER tomas487
 VOLUME /log
 VOLUME /certs
