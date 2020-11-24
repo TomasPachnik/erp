@@ -42,10 +42,4 @@ public class AuditController {
         return auditService.updateAuditData(file);
     }
 
-    @PostMapping(path = "/auditEmail")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Result sendAuditData(@RequestBody StringInput input) {
-        return auditService.sendAuditData(input);
-    }
-
 }

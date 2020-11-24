@@ -19,8 +19,6 @@ public interface AuditService {
 
     List<AuditEntity> all();
 
-    Result sendAuditData(StringInput input);
-
     Result updateAuditData(MultipartFile file);
 
 
