@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import sk.tomas.erp.entity.InvoiceEntity;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +16,9 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
 
     @Query("SELECT l FROM InvoiceEntity l WHERE l.owner = ?1 order by l.invoiceNumber asc")
     List<InvoiceEntity> all(UUID owner);
+
+    @Query("SELECT l FROM InvoiceEntity l WHERE l.owner = ?1 and l.deliveryDate >= date order by l.invoiceNumber asc")
+    List<InvoiceEntity> allFromDate(UUID owner, Date date);
 
     Page<InvoiceEntity> findByOwner(UUID owner, Pageable pageable);
 

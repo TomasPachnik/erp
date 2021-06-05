@@ -17,6 +17,7 @@ import sk.tomas.erp.bo.Paging;
 import sk.tomas.erp.bo.PagingInput;
 import sk.tomas.erp.entity.AssetEntity;
 import sk.tomas.erp.entity.InvoiceEntity;
+import sk.tomas.erp.entity.Last12Months;
 import sk.tomas.erp.entity.UserEntity;
 import sk.tomas.erp.exception.ResourceNotFoundException;
 import sk.tomas.erp.exception.SqlException;
@@ -30,6 +31,7 @@ import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -142,6 +144,26 @@ public class InvoiceServiceImpl implements InvoiceService {
             log.error(e.getMessage());
             throw new SqlException(MessageFormat.format("Cannot save {0}", invoiceInput.getClass().getSimpleName()));
         }
+    }
+
+    @Override
+    public Last12Months calculateRevenueForLast12Months() {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        List<InvoiceEntity> all = invoiceRepository.allFromDate(userService.getLoggedUser().getUuid(), calendar.getTime());
+
+        BigDecimal amount = BigDecimal.ZERO;
+        for (InvoiceEntity invoice : all) {
+            amount = amount.add(invoice.getTotal());
+        }
+
+        return Last12Months.builder()
+                .from(calendar.getTime())
+                .invoiceCount(all.size())
+                .amount(amount)
+                .build();
     }
 
     private BigDecimal calculateTotal(InvoiceEntity invoiceEntity) {

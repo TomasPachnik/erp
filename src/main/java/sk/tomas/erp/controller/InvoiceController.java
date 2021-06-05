@@ -11,6 +11,7 @@ import sk.tomas.erp.bo.Invoice;
 import sk.tomas.erp.bo.InvoiceInput;
 import sk.tomas.erp.bo.Paging;
 import sk.tomas.erp.bo.PagingInput;
+import sk.tomas.erp.entity.Last12Months;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.PdfService;
 
@@ -38,6 +39,11 @@ public class InvoiceController {
     @PostMapping(path = "/all")
     public Paging all(@RequestBody PagingInput input) {
         return invoiceService.allInvoices(input);
+    }
+
+    @GetMapping(path = "/last12Months")
+    public Last12Months last12Months() {
+        return invoiceService.calculateRevenueForLast12Months();
     }
 
     @GetMapping("/remove/{uuid}")
