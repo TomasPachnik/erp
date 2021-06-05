@@ -6,4 +6,8 @@ public interface DateService {
 
     Date getActualDate();
 
+    Date getFirstDayOfThisMonthLastYearDate();
+
+    Date addMonths(Date date, int months);
+
 }

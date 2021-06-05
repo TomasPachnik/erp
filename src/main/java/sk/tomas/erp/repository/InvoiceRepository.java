@@ -17,7 +17,7 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
     @Query("SELECT l FROM InvoiceEntity l WHERE l.owner = ?1 order by l.invoiceNumber asc")
     List<InvoiceEntity> all(UUID owner);
 
-    @Query("SELECT l FROM InvoiceEntity l WHERE l.owner = ?1 and l.deliveryDate >= date order by l.invoiceNumber asc")
+    @Query("SELECT l FROM InvoiceEntity l WHERE l.owner = :owner and l.deliveryDate >= :date  order by l.invoiceNumber asc")
     List<InvoiceEntity> allFromDate(UUID owner, Date date);
 
     Page<InvoiceEntity> findByOwner(UUID owner, Pageable pageable);
