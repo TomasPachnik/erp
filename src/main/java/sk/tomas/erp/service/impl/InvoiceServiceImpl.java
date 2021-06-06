@@ -24,6 +24,7 @@ import sk.tomas.erp.exception.SqlException;
 import sk.tomas.erp.repository.InvoiceRepository;
 import sk.tomas.erp.repository.LegalRepository;
 import sk.tomas.erp.service.AuditService;
+import sk.tomas.erp.service.DateService;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.util.Utils;
 
@@ -31,10 +32,7 @@ import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static sk.tomas.erp.util.Utils.createdUpdated;
 import static sk.tomas.erp.util.Utils.mapPaging;
@@ -53,16 +51,18 @@ public class InvoiceServiceImpl implements InvoiceService {
     private ModelMapper mapper;
     private InvoiceRepository invoiceRepository;
     private AuditService auditService;
+    private DateService dateService;
 
     @Autowired
     public InvoiceServiceImpl(ModelMapper mapper, InvoiceRepository invoiceRepository,
                               UserServiceImpl userService, LegalRepository legalRepository,
-                              AuditService auditService) {
+                              AuditService auditService, DateService dateService) {
         this.mapper = mapper;
         this.invoiceRepository = invoiceRepository;
         this.userService = userService;
         this.legalRepository = legalRepository;
         this.auditService = auditService;
+        this.dateService = dateService;
         tableProperties = new LinkedList<>();
         fillTableProperties();
     }
@@ -148,11 +148,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Last12Months calculateRevenueForLast12Months() {
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, -1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        List<InvoiceEntity> all = invoiceRepository.allFromDate(userService.getLoggedUser().getUuid(), calendar.getTime());
+        Date date = dateService.getFirstDayOfThisMonthLastYearDate();
+        List<InvoiceEntity> all = invoiceRepository.allFromDate(userService.getLoggedUser().getUuid(), date);
 
         BigDecimal amount = BigDecimal.ZERO;
         for (InvoiceEntity invoice : all) {
@@ -160,7 +157,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         return Last12Months.builder()
-                .from(calendar.getTime())
+                .from(date)
                 .invoiceCount(all.size())
                 .amount(amount)
                 .build();

@@ -27,7 +27,7 @@ public class InvoiceTest extends BaseTest {
 
         Date now = dateService.getActualDate();
 
-        Date first = dateService.addMonths(now, -13);
+        Date first = dateService.addMonths(now, -12);
         Date second = dateService.addMonths(now, -10);
         Date third = dateService.addMonths(now, -3);
 

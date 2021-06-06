@@ -41,7 +41,7 @@ public class InvoiceController {
         return invoiceService.allInvoices(input);
     }
 
-    @GetMapping(path = "/last12Months")
+        @GetMapping(path = "/last12Months")
     public Last12Months last12Months() {
         return invoiceService.calculateRevenueForLast12Months();
     }
