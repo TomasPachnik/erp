@@ -41,4 +41,28 @@ public class InvoiceServiceValidator {
         }
     }
 
+    public static void validateQuickInvoice(InvoiceInput invoice) {
+        BaseValidator.validateNull(invoice, "Invoice");
+        BaseValidator.validateNullOrEmpty(invoice.getName(), "Name");
+        BaseValidator.validateMaxLength(invoice.getName(), 60, "name");
+        BaseValidator.validateNullOrEmpty(invoice.getInvoiceNumber(), "Invoice number");
+        BaseValidator.validateMaxLength(invoice.getInvoiceNumber(), 20, "invoice number");
+        BaseValidator.validateNullOrEmpty(invoice.getSupplierVariableSymbol(), "Variable symbol");
+        BaseValidator.validateMaxLength(invoice.getSupplierVariableSymbol(), 20, "variable symbol");
+        BaseValidator.validateNullOrEmpty(invoice.getCurrency(), "Currency");
+        BaseValidator.validateMaxLength(invoice.getCurrency(), 10, "currency");
+        BaseValidator.validateUuid(invoice.getSupplier(), "supplier");
+        BaseValidator.validateNull(invoice.getDateOfIssue(), "Date of issue");
+        BaseValidator.validateNull(invoice.getDeliveryDate(), "Delivery date");
+        BaseValidator.validateNull(invoice.getDueDate(), "Due date");
+        BaseValidator.validateNull(invoice.getAssets(), "Assets");
+        for (Asset asset : invoice.getAssets()) {
+            BaseValidator.validateNullOrEmpty(asset.getName(), "Asset name");
+            BaseValidator.validateMaxLength(asset.getName(), 60, "asset name");
+            BaseValidator.validateNullOrEmpty(asset.getUnit(), "Asset unit");
+            BaseValidator.validateMaxLength(asset.getUnit(), 10, "asset unit");
+        }
+    }
+
+
 }

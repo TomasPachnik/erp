@@ -11,10 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import sk.tomas.erp.annotations.MethodCallLogger;
-import sk.tomas.erp.bo.Invoice;
-import sk.tomas.erp.bo.InvoiceInput;
-import sk.tomas.erp.bo.Paging;
-import sk.tomas.erp.bo.PagingInput;
+import sk.tomas.erp.bo.*;
 import sk.tomas.erp.entity.AssetEntity;
 import sk.tomas.erp.entity.InvoiceEntity;
 import sk.tomas.erp.entity.Last12Months;
@@ -26,6 +23,7 @@ import sk.tomas.erp.repository.LegalRepository;
 import sk.tomas.erp.service.AuditService;
 import sk.tomas.erp.service.DateService;
 import sk.tomas.erp.service.InvoiceService;
+import sk.tomas.erp.service.LegalService;
 import sk.tomas.erp.util.Utils;
 
 import javax.transaction.Transactional;
@@ -37,8 +35,7 @@ import java.util.*;
 import static sk.tomas.erp.util.Utils.createdUpdated;
 import static sk.tomas.erp.util.Utils.mapPaging;
 import static sk.tomas.erp.validator.BaseValidator.validateUuid;
-import static sk.tomas.erp.validator.InvoiceServiceValidator.validateInvoice;
-import static sk.tomas.erp.validator.InvoiceServiceValidator.validatePagingInput;
+import static sk.tomas.erp.validator.InvoiceServiceValidator.*;
 
 @Slf4j
 @Service
@@ -52,17 +49,19 @@ public class InvoiceServiceImpl implements InvoiceService {
     private InvoiceRepository invoiceRepository;
     private AuditService auditService;
     private DateService dateService;
+    private LegalService legalService;
 
     @Autowired
     public InvoiceServiceImpl(ModelMapper mapper, InvoiceRepository invoiceRepository,
                               UserServiceImpl userService, LegalRepository legalRepository,
-                              AuditService auditService, DateService dateService) {
+                              AuditService auditService, DateService dateService, LegalService legalService) {
         this.mapper = mapper;
         this.invoiceRepository = invoiceRepository;
         this.userService = userService;
         this.legalRepository = legalRepository;
         this.auditService = auditService;
         this.dateService = dateService;
+        this.legalService = legalService;
         tableProperties = new LinkedList<>();
         fillTableProperties();
     }
@@ -114,8 +113,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     @Transactional
-    public UUID save(InvoiceInput invoiceInput) {
-        validateInvoice(invoiceInput);
+    public UUID save(InvoiceInput invoiceInput, boolean quick) {
+        if (quick) {
+            validateQuickInvoice(invoiceInput);
+        } else {
+            validateInvoice(invoiceInput);
+        }
         UserEntity loggedUser = userService.getLoggedUser();
         InvoiceEntity oldInvoice = null;
         String invoiceEntityOldString = null;
@@ -144,6 +147,15 @@ public class InvoiceServiceImpl implements InvoiceService {
             log.error(e.getMessage());
             throw new SqlException(MessageFormat.format("Cannot save {0}", invoiceInput.getClass().getSimpleName()));
         }
+    }
+
+    @Override
+    @Transactional
+    public UUID saveQuickInvoice(QuickInvoiceInput invoice) {
+        UUID customer = legalService.saveCustomer(invoice.getCustomer());
+        InvoiceInput invoiceInput = mapper.map(invoice, InvoiceInput.class);
+        invoiceInput.setCustomer(customer);
+        return save(invoiceInput, true);
     }
 
     @Override

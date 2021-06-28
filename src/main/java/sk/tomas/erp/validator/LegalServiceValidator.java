@@ -14,16 +14,15 @@ public class LegalServiceValidator {
         BaseValidator.validateNull(legal, "Legal");
         BaseValidator.validateNullOrEmpty(legal.getName(), "Name");
         BaseValidator.validateMaxLength(legal.getName(), 60, "name");
-        BaseValidator.validateNullOrEmpty(legal.getCompanyIdentificationNumber(), "Company identification number");
-        BaseValidator.validateMaxLength(legal.getCompanyIdentificationNumber(), 20, "company identification number");
-        BaseValidator.validateNullOrEmpty(legal.getTaxIdentificationNumber(), "Tax identification number");
-        BaseValidator.validateMaxLength(legal.getTaxIdentificationNumber(), 20, "tax identification number");
         AddressServiceValidator.validateAddress(legal.getAddress());
-        validateBankAccount(legal.getBankAccount());
+
+        if (legal.getBankAccount() != null) {
+            validateBankAccount(legal.getBankAccount());
+        }
+
     }
 
-
-    public static void validateBankAccount(BankAccount account) {
+    private static void validateBankAccount(BankAccount account) {
         BaseValidator.validateNull(account, "BankAccount");
         BaseValidator.validateNullOrEmpty(account.getBankName(), "Bank name");
         BaseValidator.validateMaxLength(account.getBankName(), 30, "bank name");

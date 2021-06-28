@@ -7,10 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sk.tomas.erp.bo.Invoice;
-import sk.tomas.erp.bo.InvoiceInput;
-import sk.tomas.erp.bo.Paging;
-import sk.tomas.erp.bo.PagingInput;
+import sk.tomas.erp.bo.*;
 import sk.tomas.erp.entity.Last12Months;
 import sk.tomas.erp.service.InvoiceService;
 import sk.tomas.erp.service.PdfService;
@@ -41,7 +38,7 @@ public class InvoiceController {
         return invoiceService.allInvoices(input);
     }
 
-        @GetMapping(path = "/last12Months")
+    @GetMapping(path = "/last12Months")
     public Last12Months last12Months() {
         return invoiceService.calculateRevenueForLast12Months();
     }
@@ -53,7 +50,12 @@ public class InvoiceController {
 
     @PostMapping(path = "/save")
     public UUID save(@RequestBody InvoiceInput invoice) {
-        return invoiceService.save(invoice);
+        return invoiceService.save(invoice, false);
+    }
+
+    @PostMapping(path = "/saveQuickInvoice")
+    public UUID saveQuickInvoice(@RequestBody QuickInvoiceInput invoice) {
+        return invoiceService.saveQuickInvoice(invoice);
     }
 
     @GetMapping(path = "/generate/{uuid}", produces = MediaType.APPLICATION_PDF_VALUE)

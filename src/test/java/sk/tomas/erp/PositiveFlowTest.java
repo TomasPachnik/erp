@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class PositiveFlowTest extends BaseTest{
+public class PositiveFlowTest extends BaseTest {
 
     @Autowired
     private PdfService pdfService;
@@ -33,6 +33,8 @@ public class PositiveFlowTest extends BaseTest{
         pdfService.generatePdf(invoiceService.get(invoice));
         updateInvoice(invoice);
 
+        UUID quickInvoice = createQuickInvoice(supplier, dateService.getActualDate());
+
         userService.all();
         legalService.allCustomers();
         legalService.allSuppliers();
@@ -44,8 +46,11 @@ public class PositiveFlowTest extends BaseTest{
         invoiceService.allInvoices(new PagingInput(null, null, null, 0, 10));
 
         deleteInvoice(invoice);
+        deleteInvoice(quickInvoice);
         deleteSupplier(supplier);
         deleteCustomer(customer);
         deleteUserByAdmin(user);
+
+
     }
 }

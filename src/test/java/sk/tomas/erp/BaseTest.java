@@ -121,7 +121,7 @@ public class BaseTest {
         invoice.setDueDate(date);
         invoice.setNote("note");
         invoice.setAssets(createAssets());
-        UUID uuid = invoiceService.save(invoice);
+        UUID uuid = invoiceService.save(invoice, false);
         Invoice changed = invoiceService.get(uuid);
         InvoiceInput invoiceInput = mapper.map(changed, InvoiceInput.class);
         invoiceInput.setSupplier(changed.getSupplier().getUuid());
@@ -133,13 +133,46 @@ public class BaseTest {
         return uuid;
     }
 
+    protected UUID createQuickInvoice(UUID supplier,  Date date) {
+        Customer customer = new Customer();
+        customer.setName("name");
+        customer.setCompanyIdentificationNumber("ico");
+        customer.setTaxIdentificationNumber("dic");
+        customer.setBankAccount(createAccount());
+        customer.setAddress(createAddress());
+
+        QuickInvoiceInput invoice = new QuickInvoiceInput();
+        invoice.setName("name");
+        invoice.setInvoiceNumber("invoice_number");
+        invoice.setCurrency("€");
+        invoice.setSupplier(supplier);
+        invoice.setCustomer(customer);
+        invoice.setSupplierVariableSymbol("variable_symbol");
+        invoice.setDateOfIssue(date);
+        invoice.setDeliveryDate(date);
+        invoice.setDueDate(date);
+        invoice.setNote("note");
+        invoice.setAssets(createAssets());
+        UUID uuid = invoiceService.saveQuickInvoice(invoice);
+        Invoice changed = invoiceService.get(uuid);
+        QuickInvoiceInput invoiceInput = mapper.map(changed, QuickInvoiceInput.class);
+        invoiceInput.setSupplier(changed.getSupplier().getUuid());
+        invoiceInput.setCustomer(changed.getCustomer());
+        invoiceInput.setDateOfIssue(new Date(invoiceInput.getDateOfIssue().getTime()));
+        invoiceInput.setDeliveryDate(new Date(invoiceInput.getDeliveryDate().getTime()));
+        invoiceInput.setDueDate(new Date(invoiceInput.getDueDate().getTime()));
+        Assert.assertEquals(invoice, invoiceInput);
+        return uuid;
+    }
+
+
     protected void updateInvoice(UUID uuid) {
         Invoice invoice = invoiceService.get(uuid);
         invoice.setName("new_name");
         InvoiceInput invoiceInput = mapper.map(invoice, InvoiceInput.class);
         invoiceInput.setSupplier(invoice.getSupplier().getUuid());
         invoiceInput.setCustomer(invoice.getCustomer().getUuid());
-        invoiceService.save(invoiceInput);
+        invoiceService.save(invoiceInput, false);
         Invoice changed = invoiceService.get(uuid);
         invoice.setDateOfIssue(new Date(changed.getDateOfIssue().getTime()));
         invoice.setDeliveryDate(new Date(changed.getDeliveryDate().getTime()));
