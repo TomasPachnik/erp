@@ -24,12 +24,12 @@ public class LegalServiceValidator {
 
     private static void validateBankAccount(BankAccount account) {
         BaseValidator.validateNull(account, "BankAccount");
-        BaseValidator.validateNullOrEmpty(account.getBankName(), "Bank name");
-        BaseValidator.validateMaxLength(account.getBankName(), 30, "bank name");
-        try {
-            Iban.valueOf(account.getIban());
-        } catch (IbanFormatException | InvalidCheckDigitException | UnsupportedCountryException e) {
-            throw new InputValidationException("IBAN is not valid.");
+        if (account.getIban() != null && !account.getIban().isEmpty()) {
+            try {
+                Iban.valueOf(account.getIban());
+            } catch (IbanFormatException | InvalidCheckDigitException | UnsupportedCountryException e) {
+                throw new InputValidationException("IBAN is not valid.");
+            }
         }
     }
 
